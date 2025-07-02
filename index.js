@@ -13,28 +13,25 @@ app.use(cors());
 const authRoute = require("./src/routes/auth.route");
 app.use("/api/v1/auth", authRoute);
 
-// Health check route (optional)
+// Health check route (for Render to confirm it works)
 app.get("/", (req, res) => {
   res.send("✅ Backend is running on Render");
-});   
-   
-// Use Render's provided PORT or fallback to 4000 (for local dev)
+});
+
+// Use Render's provided PORT or fallback for local
 const port = process.env.PORT || 4000;
 const mongodbUrl = process.env.MONGO_DB_URL;
 
-// Database Connection and Server Start
-const connectDB = async () => {
-  try {
-    await mongoose.connect(mongodbUrl);
-    console.log("MongoDB connected");
+// Connect to MongoDB and Start Server
+mongoose
+  .connect(mongodbUrl)
+  .then(() => {
+    console.log("✅ MongoDB connected");
 
     app.listen(port, () => {
-      console.log(`Server listening on port ${port}`);
+      console.log(`🚀 Server is running on port ${port}`);
     });
-  } catch (error) {
-    console.error(" MongoDB connection failed:", error.message);
-  }
-};
-
-connectDB();
-
+  })
+  .catch((error) => {
+    console.error("❌ MongoDB connection failed:", error.message);
+  });
