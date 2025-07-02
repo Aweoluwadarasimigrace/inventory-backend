@@ -1,6 +1,7 @@
 const Auth = require("../model/auth.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail");
 
 const getToken = (id) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
@@ -38,18 +39,66 @@ const registerUser = async (req, res) => {
       lastname,
       email,
       password: hashedPassword,
+      verified: false,
     });
 
+    const id = newUser._id;
+    const verifyEmailToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "10m",
+    });
+    const baseUrl = process.env.BASE_URL;
+    const verifyLink = `${baseUrl}/api/v1/auth/verify/${verifyEmailToken}`;
+
+    const html = `
+    <h1>Verify your Email</h1>
+    <p>click the link to verify your email</p>
+    <a href="${verifyLink}">link</a>
+    `;
+
+    await sendEmail(email, "verify your account ", html);
     const token = getToken(newUser._id);
 
     res.status(200).json({
       success: true,
-      message: "successful",
+      message:
+        "successfully created user, please verify your email  to proceed",
       data: newUser,
       token,
     });
   } catch (error) {
     console.log(error);
+  }
+};
+
+const verifyEmail = async (req, res) => {
+  const verifyToken = req.params.token;
+
+  if (!verifyToken) {
+    return res.json({ message: "user nor present" });
+  }
+
+  try {
+    const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET_KEY);
+
+    const userId = decoded.id;
+
+    const user = await Auth.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+
+    if (user.verified) {
+      return res.status(200).json({ message: "email already verified" });
+    }
+
+    user.verified = true;
+
+    await user.save();
+    return res.status(200).json({ message: "Email verified successfully!" });
+  } catch (error) {
+     console.error("Verification error:", error.message);
+    return res.status(400).json({ message: "Invalid or expired token" });
   }
 };
 const loginUser = async (req, res) => {
@@ -61,6 +110,12 @@ const loginUser = async (req, res) => {
     if (!user) {
       return res.json({
         message: "user not found/ login failed",
+      });
+    }
+
+    if (!user.verified) {
+      return res.json({
+        message: "email has not been verfied",
       });
     }
 
@@ -78,7 +133,7 @@ const loginUser = async (req, res) => {
       token,
     });
   } catch (error) {
-    res.json({   
+    res.json({
       error: error,
     });
   }
@@ -87,4 +142,5 @@ const loginUser = async (req, res) => {
 module.exports = {
   loginUser,
   registerUser,
+  verifyEmail,
 };
