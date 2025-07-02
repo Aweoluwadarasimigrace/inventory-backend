@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 });   
    
 // Use Render's provided PORT or fallback to 4000 (for local dev)
-const port = process.env.PORT;
+const port = process.env.PORT || 4000;
 const mongodbUrl = process.env.MONGO_DB_URL;
 
 // Database Connection and Server Start
