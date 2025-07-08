@@ -8,9 +8,14 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: true,
-  credentials:true
+  origin: [
+    "http://localhost:5173", 
+    "http://localhost:5175",
+    "https://inventory-frontend-woad-ten.vercel.app"
+  ],
+  credentials: true
 }));
+
 app.use(cookieParser())
 // Routes
 const authRoute = require("./src/routes/auth.route");

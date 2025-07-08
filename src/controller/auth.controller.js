@@ -11,6 +11,7 @@ const getToken = (id) => {
 };
 
 const registerUser = async (req, res) => {
+  console.log(req.body)
   const { email, firstname, lastname, password } = req.body;
 
   if (!email || !password || !firstname || !lastname) {
