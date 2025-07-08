@@ -3,6 +3,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
 
+
+// generate token
 const getToken = (id) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
     expiresIn: "7d",
@@ -10,8 +12,10 @@ const getToken = (id) => {
   return token;
 };
 
+// register user
+
 const registerUser = async (req, res) => {
-  console.log(req.body)
+  console.log(req.body);
   const { email, firstname, lastname, password } = req.body;
 
   if (!email || !password || !firstname || !lastname) {
@@ -23,7 +27,6 @@ const registerUser = async (req, res) => {
 
   try {
     const existingUser = await Auth.findOne({ email });
-
     if (existingUser) {
       return res.json({
         status: "FAILED",
@@ -32,9 +35,7 @@ const registerUser = async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(13);
-
     const hashedPassword = await bcrypt.hash(password, salt);
-
     const newUser = await Auth.create({
       firstname,
       lastname,
@@ -58,27 +59,28 @@ const registerUser = async (req, res) => {
 
     await sendEmail(email, "verify your account ", html);
 
-     const token = getToken(newUser._id);
+    const token = getToken(newUser._id);
 
-     res.cookie("token", token,{
-      httpOnly:true,
+    res.cookie("token", token, {
+      httpOnly: true,
       secure: true,
       sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-     })
+    });
 
     res.status(200).json({
       success: true,
       message:
         "successfully created user, please verify your email  to proceed",
       data: newUser,
-
     });
   } catch (error) {
     console.log(error);
   }
 };
 
+
+// verify email
 const verifyEmail = async (req, res) => {
   const verifyToken = req.params.token;
 
@@ -106,10 +108,52 @@ const verifyEmail = async (req, res) => {
     await user.save();
     return res.status(200).json({ message: "Email verified successfully!" });
   } catch (error) {
-     console.error("Verification error:", error.message);
-    return res.status(400).json({ message: "Invalid or expired token" });
+    console.error("Verification error:", error.message);
+    return res
+      .status(400)
+      .json({ message: "Invalid or expired token", error: error.message });
   }
 };
+
+// resend  email link
+const resendEmail = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "email is required" });
+  }
+
+  try {
+    const userExist = await Auth.findOne({ email });
+
+    if (!userExist) {
+      return res.status(404).json({ message: "user doesn't exists" });
+    }
+
+    if (userExist.verified) {
+      return res.status(400).json({ message: "user is already verified" });
+    }
+
+    const id = userExist._id;
+    const token = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "10m",
+    });
+    const baseUrl = process.env.FRONTEND_URL;
+    const verifyLink = `${baseUrl}/api/v1/auth/verify/${token}`;
+
+    const html = `<h1>Verify your Email</h1>
+    <p>click the link to verify your email</p>
+    <a href="${verifyLink}">link</a>`;
+
+    await sendEmail(email, "verify your account", html);
+    res.status(200).json({ message: "Verification email resent!" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+// login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -152,4 +196,5 @@ module.exports = {
   loginUser,
   registerUser,
   verifyEmail,
+  resendEmail
 };
