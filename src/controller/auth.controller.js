@@ -5,7 +5,7 @@ const sendEmail = require("../utils/sendEmail");
 
 const getToken = (id) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: "30d",
+    expiresIn: "7d",
   });
   return token;
 };
@@ -56,14 +56,22 @@ const registerUser = async (req, res) => {
     `;
 
     await sendEmail(email, "verify your account ", html);
-    const token = getToken(newUser._id);
+
+     const token = getToken(newUser._id);
+
+     res.cookie("token", token,{
+      httpOnly:true,
+      secure: true,
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+     })
 
     res.status(200).json({
       success: true,
       message:
         "successfully created user, please verify your email  to proceed",
       data: newUser,
-      token,
+
     });
   } catch (error) {
     console.log(error);
