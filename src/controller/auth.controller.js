@@ -46,7 +46,7 @@ const registerUser = async (req, res) => {
     const verifyEmailToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "10m",
     });
-    const baseUrl = process.env.BASE_URL;
+    const baseUrl = process.env.FRONTEND_URL;
     const verifyLink = `${baseUrl}/api/v1/auth/verify/${verifyEmailToken}`;
 
     const html = `
