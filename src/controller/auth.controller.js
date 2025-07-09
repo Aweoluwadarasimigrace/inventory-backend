@@ -140,7 +140,7 @@ const resendEmail = async (req, res) => {
       expiresIn: "10m",
     });
     const baseUrl = process.env.FRONTEND_URL;
-    const verifyLink = `${baseUrl}/api/v1/auth/verify/${token}`;
+    const verifyLink = `${baseUrl}/auth/verify-email/?token=${token}`;
 
     const html = `<h1>Verify your Email</h1>
     <p>click the link to verify your email</p>
