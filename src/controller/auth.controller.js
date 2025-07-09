@@ -48,8 +48,9 @@ const registerUser = async (req, res) => {
     const verifyEmailToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "10m",
     });
+    console.log(verifyEmailToken)
     const baseUrl = process.env.FRONTEND_URL;
-    const verifyLink = `${baseUrl}/auth/verify-email/${verifyEmailToken}`;
+    const verifyLink = `${baseUrl}/auth/verify-email/?token=${verifyEmailToken}`;
 
     const html = `
     <h1>Verify your Email</h1>
@@ -82,7 +83,7 @@ const registerUser = async (req, res) => {
 
 // verify email
 const verifyEmail = async (req, res) => {
-  const verifyToken = req.params.token;
+  const verifyToken = req.query.token;
 
   if (!verifyToken) {
     return res.json({ message: "user nor present" });
