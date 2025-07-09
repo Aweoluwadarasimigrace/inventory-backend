@@ -49,7 +49,7 @@ const registerUser = async (req, res) => {
       expiresIn: "10m",
     });
     const baseUrl = process.env.FRONTEND_URL;
-    const verifyLink = `${baseUrl}/api/v1/auth/verify/${verifyEmailToken}`;
+    const verifyLink = `${baseUrl}/auth/verify-email/${verifyEmailToken}`;
 
     const html = `
     <h1>Verify your Email</h1>
