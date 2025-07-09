@@ -3,7 +3,7 @@ const { loginUser, registerUser, verifyEmail, resendEmail } = require("../contro
 
 const router = express.Router();
 router.post("/register", registerUser);
-router.get("/verify", verifyEmail)
+router.get("/verify-email", verifyEmail)
 router.post("/login", loginUser);
 router.post("/resend-verification", resendEmail)
 
