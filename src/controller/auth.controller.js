@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
 
-
 // generate token
 const getToken = (id) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
@@ -48,7 +47,7 @@ const registerUser = async (req, res) => {
     const verifyEmailToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "10m",
     });
-    console.log(verifyEmailToken)
+    console.log(verifyEmailToken);
     const baseUrl = process.env.FRONTEND_URL;
     const verifyLink = `${baseUrl}/auth/verify-email/?token=${verifyEmailToken}`;
 
@@ -76,15 +75,16 @@ const registerUser = async (req, res) => {
       data: newUser,
     });
   } catch (error) {
-    console.log(error);
+    return res
+      .status(400)
+      .json({ message: "an error occured", error: error.message });
   }
 };
-
 
 // verify email
 const verifyEmail = async (req, res) => {
   const verifyToken = req.query.token;
-  console.log(verifyToken)
+  console.log(verifyToken);
 
   if (!verifyToken) {
     return res.json({ message: "user nor present" });
@@ -93,10 +93,10 @@ const verifyEmail = async (req, res) => {
   try {
     const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET_KEY);
     const userId = decoded.id;
-    console.log(userId)
+    console.log(userId);
 
     const user = await Auth.findById(userId);
-    console.log(user.firstname)
+    console.log(user.firstname);
 
     if (!user) {
       return res.status(404).json({ message: "user not found" });
@@ -109,12 +109,12 @@ const verifyEmail = async (req, res) => {
     user.verified = true;
 
     await user.save();
-    return res.status(200).json({ message: "Email verified successfully!"});
+    return res.status(200).json({ message: "Email verified successfully!" });
   } catch (error) {
     console.error("Verification error:", error.message);
     return res
       .status(400)
-      .json({ message: "Invalid or expired token", error: error.message });
+      .json({ message: "an error occured", error: error.message });
   }
 };
 
@@ -151,10 +151,11 @@ const resendEmail = async (req, res) => {
     await sendEmail(email, "verify your account", html);
     res.status(200).json({ message: "Verification email resent!" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "an error occured", error: error.message });
   }
 };
-
 
 // login user
 const loginUser = async (req, res) => {
@@ -164,40 +165,63 @@ const loginUser = async (req, res) => {
     const user = await Auth.findOne({ email });
 
     if (!user) {
-      return res.json({
+      return res.status(404).json({
         message: "user not found/ login failed",
       });
     }
 
     if (!user.verified) {
-      return res.json({
+      return res.status(404).json({
         message: "email has not been verfied",
       });
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
-      return res.json({
+      return res.status(404).json({
         message: "something went wrong",
       });
     }
 
     const id = user._id;
     const token = getToken(id);
-    res.json({
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.status(200).json({
       message: "login successful",
-      token,
     });
   } catch (error) {
-    res.json({
-      error: error,
-    });
+    return res
+      .status(400)
+      .json({ message: "an error occured", error: error.message });
   }
 };
 
+const logOut = async () => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+    });
+
+    
+
+   return res.json({})
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: "Invalid or expired token", error: error.message });
+  }
+};
 module.exports = {
   loginUser,
   registerUser,
   verifyEmail,
-  resendEmail
+  resendEmail,
+  logOut,
 };
