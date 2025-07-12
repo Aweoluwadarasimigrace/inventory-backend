@@ -6,6 +6,6 @@ router.post("/register", registerUser);
 router.get("/verify-email", verifyEmail)
 router.post("/login", loginUser);
 router.post("/resend-verification", resendEmail);
-router.post("logout", logOut)
+router.post("/logout", logOut)
 
 module.exports = router;
