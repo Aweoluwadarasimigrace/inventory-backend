@@ -2,11 +2,11 @@ const { default: mongoose } = require("mongoose");
 
 
 const authSchema = new mongoose.Schema({
-    firstname: {
+    companyName: {
         type: String,
         required: true
     },
-    lastname:{
+    contact:{
         type:String,
         required:true
     },
@@ -19,6 +19,10 @@ const authSchema = new mongoose.Schema({
     password:{
         type:String,
         required:true
+    },
+    country:{
+        type:String,
+        required: true
     },
     verified: {
         type: Boolean,

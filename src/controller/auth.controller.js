@@ -15,9 +15,9 @@ const getToken = (id) => {
 
 const registerUser = async (req, res) => {
   console.log(req.body);
-  const { email, firstname, lastname, password } = req.body;
+  const { email, companyName, contact, password, country } = req.body;
 
-  if (!email || !password || !firstname || !lastname) {
+  if (!email || !password || !contact || !companyName ||!country) {
     return res.status(404).json({
       status: "FAILED",
       message: "Fill out all fields",
@@ -36,9 +36,10 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(13);
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = await Auth.create({
-      firstname,
-      lastname,
+      companyName,
+      country,
       email,
+      contact,
       password: hashedPassword,
       verified: false,
     });
@@ -160,7 +161,6 @@ const resendEmail = async (req, res) => {
 // login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await Auth.findOne({ email });
 
