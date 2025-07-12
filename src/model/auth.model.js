@@ -5,7 +5,12 @@ const authSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  contact: {
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+    contact: {
     type: String,
     required: true,
   },
@@ -16,11 +21,6 @@ const authSchema = new mongoose.Schema({
   countrycode: {
     type: String,
     required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
   },
   password: {
     type: String,

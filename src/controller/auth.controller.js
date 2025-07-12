@@ -15,7 +15,7 @@ const getToken = (id) => {
 
 const registerUser = async (req, res) => {
   console.log(req.body);
-  const { email, companyName, contact, password, country, countryCode, number } = req.body;
+  const {companyName,email, contact,countryCode, number,password, country} = req.body;
 
   if (!email || !password || !contact || !companyName || !country || !countryCode || !number) {
     return res.status(404).json({
@@ -37,12 +37,12 @@ const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = await Auth.create({
       companyName,
-      country,
       email,
       contact,
       number,
       countryCode,
       password: hashedPassword,
+       country, 
       verified: false,
     });
 
