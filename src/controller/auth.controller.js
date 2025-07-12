@@ -201,7 +201,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-const logOut = async () => {
+const logOut = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
@@ -211,7 +211,7 @@ const logOut = async () => {
 
     
 
-   return res.json({})
+   return res.json({message: "logout successful"})
   } catch (error) {
     return res
       .status(400)

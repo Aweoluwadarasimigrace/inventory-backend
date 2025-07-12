@@ -3,10 +3,12 @@ const nodemailer = require("nodemailer");
 const sendEmail = async (email, subject, html) => {
   try {
     const info = nodemailer.createTransport({
+      host:"smtp-relay.brevo.com",
+      port:587,
       service: "gmail",
       auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD,
+        user: process.env.SMPT_USER,
+        pass: process.env.SMPT_PASS,
       },
     });
 
