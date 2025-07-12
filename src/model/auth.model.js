@@ -7,7 +7,7 @@ const authSchema = new mongoose.Schema({
         required: true
     },
     contact:{
-        type:String,
+        type:Number,
         required:true
     },
     email:{
