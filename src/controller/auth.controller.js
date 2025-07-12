@@ -15,9 +15,9 @@ const getToken = (id) => {
 
 const registerUser = async (req, res) => {
   console.log(req.body);
-  const { email, companyName, contact, password, country } = req.body;
+  const { email, companyName, contact, password, country, countryCode, number } = req.body;
 
-  if (!email || !password || !contact || !companyName ||!country) {
+  if (!email || !password || !contact || !companyName || !country || !countryCode || !number) {
     return res.status(404).json({
       status: "FAILED",
       message: "Fill out all fields",
@@ -40,6 +40,8 @@ const registerUser = async (req, res) => {
       country,
       email,
       contact,
+      number,
+      countryCode,
       password: hashedPassword,
       verified: false,
     });
