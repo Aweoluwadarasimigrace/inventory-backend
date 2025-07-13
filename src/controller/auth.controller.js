@@ -40,7 +40,7 @@ const registerUser = async (req, res) => {
       email,
       contact,
       number,
-      countryCode,
+      countrycode,
       password: hashedPassword,
        country, 
       verified: false,
