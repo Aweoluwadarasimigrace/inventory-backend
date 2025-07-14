@@ -63,7 +63,7 @@ const registerUser = async (req, res) => {
     await sendEmail(email, "verify your account ", html);
 
     const token = getToken(newUser._id);
-
+    
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,

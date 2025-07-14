@@ -5,7 +5,7 @@ const sendEmail = async (email, subject, html) => {
     const info = nodemailer.createTransport({
       host:"smtp-relay.brevo.com",
       port:587,
-      service: "gmail",
+     secure:false,
       auth: {
         user: process.env.SMPT_USER,
         pass: process.env.SMPT_PASS,
