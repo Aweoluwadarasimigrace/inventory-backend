@@ -63,7 +63,7 @@ const registerUser = async (req, res) => {
     await sendEmail(email, "verify your account ", html);
 
     const token = getToken(newUser._id);
-    
+
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
@@ -71,7 +71,7 @@ const registerUser = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message:
         "successfully created user, please verify your email  to proceed",
@@ -112,7 +112,7 @@ const verifyEmail = async (req, res) => {
     user.verified = true;
 
     await user.save();
-    return res.status(200).json({ message: "Email verified successfully!" });
+    return res.status(201).json({ message: "Email verified successfully!" });
   } catch (error) {
     console.error("Verification error:", error.message);
     return res
@@ -137,7 +137,7 @@ const resendEmail = async (req, res) => {
     }
 
     if (userExist.verified) {
-      return res.status(400).json({ message: "user is already verified" });
+      return res.status(404).json({ message: "user is already verified" });
     }
 
     const id = userExist._id;
@@ -152,10 +152,10 @@ const resendEmail = async (req, res) => {
     <a href="${verifyLink}">link</a>`;
 
     await sendEmail(email, "verify your account", html);
-    res.status(200).json({ message: "Verification email resent!" });
+    res.status(201).json({ message: "Verification email resent!" });
   } catch (error) {
     return res
-      .status(500)
+      .status(400)
       .json({ message: "an error occured", error: error.message });
   }
 };
@@ -193,7 +193,7 @@ const loginUser = async (req, res) => {
       sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    res.status(200).json({
+    res.status(201).json({
       message: "login successful",
     });
   } catch (error) {
