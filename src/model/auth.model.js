@@ -10,7 +10,7 @@ const authSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-    contact: {
+  contact: {
     type: String,
     required: true,
   },
@@ -26,14 +26,27 @@ const authSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  profilepicture: {
+    data: Buffer,
+    contentType: string,
+  },
   country: {
     type: String,
     required: true,
   },
-  role:{
+  role: {
     type: String,
     enum: ["admin", "sales"],
-    default: "admin"
+    default: "admin",
+  },
+  firstname: {
+    type: String,
+  },
+  username:{
+    type:String
+  },
+  lastname: {
+    type:Sting
   },
   verified: {
     type: Boolean,

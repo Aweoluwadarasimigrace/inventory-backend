@@ -15,9 +15,25 @@ const getToken = (id) => {
 
 const registerUser = async (req, res) => {
   console.log(req.body);
-  const {companyName,email, contact,countrycode, number,password, country} = req.body;
+  const {
+    companyName,
+    email,
+    contact,
+    countrycode,
+    number,
+    password,
+    country,
+  } = req.body;
 
-  if (!email || !password || !contact || !companyName || !country || !countrycode || !number) {
+  if (
+    !email ||
+    !password ||
+    !contact ||
+    !companyName ||
+    !country ||
+    !countrycode ||
+    !number
+  ) {
     return res.status(404).json({
       status: "FAILED",
       message: "Fill out all fields",
@@ -42,7 +58,7 @@ const registerUser = async (req, res) => {
       number,
       countrycode,
       password: hashedPassword,
-       country, 
+      country,
       verified: false,
     });
 
@@ -55,10 +71,27 @@ const registerUser = async (req, res) => {
     const verifyLink = `${baseUrl}/auth/verify-email/?token=${verifyEmailToken}`;
 
     const html = `
-    <h1>Verify your Email</h1>
-    <p>click the link to verify your email</p>
-    <a href="${verifyLink}">link</a>
-    `;
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9;">
+    <h2 style="color: #333;">Welcome to TRACKSTACK INVENTORY 🎉</h2>
+    <p style="font-size: 16px; color: #555;">
+      Hello ${companyName},
+    </p>
+    <p style="font-size: 16px; color: #555;">
+      Thank you for registering! To complete your signup and activate your account, please verify your email address by clicking the button below.
+    </p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${verifyLink}" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+        Verify Email
+      </a>
+    </div>
+    <p style="font-size: 14px; color: #999;">
+      If you did not sign up for this account, you can ignore this email.
+    </p>
+    <p style="font-size: 14px; color: #999;">
+      — The TRACKSTACK INVENTORY Team
+    </p>
+  </div>
+`;
 
     await sendEmail(email, "verify your account ", html);
 
@@ -147,9 +180,29 @@ const resendEmail = async (req, res) => {
     const baseUrl = process.env.FRONTEND_URL;
     const verifyLink = `${baseUrl}/auth/verify-email/?token=${token}`;
 
-    const html = `<h1>Verify your Email</h1>
-    <p>click the link to verify your email</p>
-    <a href="${verifyLink}">link</a>`;
+   const html = `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9;">
+    <h2 style="color: #333;">Resend: Verify Your Email Address 🔄</h2>
+    <p style="font-size: 16px; color: #555;">
+      Hi again,
+    </p>
+    <p style="font-size: 16px; color: #555;">
+      It looks like you haven't verified your email address yet. Please click the button below to complete your registration and activate your account.
+    </p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${verifyLink}" style="background-color: #007BFF; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+        Verify Email Now
+      </a>
+    </div>
+    <p style="font-size: 14px; color: #999;">
+      If you've already verified your email, you can ignore this message.
+    </p>
+    <p style="font-size: 14px; color: #999;">
+      — The TRACKSTACK INVENTORY Team
+    </p>
+  </div>
+`;
+
 
     await sendEmail(email, "verify your account", html);
     res.status(201).json({ message: "Verification email resent!" });
@@ -211,9 +264,7 @@ const logOut = async (req, res) => {
       sameSite: "Strict",
     });
 
-    
-
-   return res.json({message: "logout successful"})
+    return res.json({ message: "logout successful" });
   } catch (error) {
     return res
       .status(400)

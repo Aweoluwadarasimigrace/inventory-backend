@@ -19,8 +19,9 @@ app.use(cors({
 app.use(cookieParser())
 // Routes
 const authRoute = require("./src/routes/auth.route");
+const userRoute = require("./src/routes/user.route")
 app.use("/api/v1/auth", authRoute);
-
+app.use("/api/v1/user", userRoute)
 // Health check route (for Render to confirm it works)
 app.get("/", (req, res) => {
   res.send("✅ Backend is running on Render");
