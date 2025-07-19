@@ -14,7 +14,6 @@ const getToken = (id) => {
 // register user
 
 const registerUser = async (req, res) => {
-  console.log(req.body);
   const {
     companyName,
     email,
@@ -120,19 +119,17 @@ const registerUser = async (req, res) => {
 // verify email
 const verifyEmail = async (req, res) => {
   const verifyToken = req.query.token;
-  console.log(verifyToken);
-
   if (!verifyToken) {
     return res.json({ message: "user nor present" });
   }
 
   try {
     const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET_KEY);
+
     const userId = decoded.id;
-    console.log(userId);
 
     const user = await Auth.findById(userId);
-    console.log(user.firstname);
+   
 
     if (!user) {
       return res.status(404).json({ message: "user not found" });
@@ -147,7 +144,6 @@ const verifyEmail = async (req, res) => {
     await user.save();
     return res.status(201).json({ message: "Email verified successfully!" });
   } catch (error) {
-    console.error("Verification error:", error.message);
     return res
       .status(400)
       .json({ message: "an error occured", error: error.message });
