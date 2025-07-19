@@ -5,7 +5,7 @@ const upload = require("../middleware/uploads.middleware")
 const router = express.Router()
 
 router.use(verifyToken, verifyIsAdmin)
-router.post("/createUser", upload.single("image") ,createUserByAdmin)
+router.post("/createuser", upload.single("image") ,createUserByAdmin)
 router.get("/getuser", getUserByAdmin )
 
 module.exports = router
