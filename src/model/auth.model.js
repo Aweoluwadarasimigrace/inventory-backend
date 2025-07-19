@@ -4,6 +4,15 @@ const authSchema = new mongoose.Schema({
   companyName: {
     type: String,
   },
+  firstname: {
+    type: String,
+  },
+  username:{
+    type:String
+  },
+  lastname: {
+    type:String
+  },
   email: {
     type: String,
     required: true,
@@ -37,15 +46,6 @@ const authSchema = new mongoose.Schema({
     type: String,
     enum: ["admin", "sales"],
     default: "admin",
-  },
-  firstname: {
-    type: String,
-  },
-  username:{
-    type:String
-  },
-  lastname: {
-    type:String
   },
   verified: {
     type: Boolean,
