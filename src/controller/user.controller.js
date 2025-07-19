@@ -42,9 +42,10 @@ const createUserByAdmin = async (req, res) => {
     !contact ||
     !number ||
     !countrycode ||
-    !password
+    !password 
+
   ) {
-    res.status(404).json({ message: "user not found" });
+    res.status(404).json({ message: "please fill out all fields" });
   }
 
   try {
