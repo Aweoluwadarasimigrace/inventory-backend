@@ -166,7 +166,7 @@ const resendEmail = async (req, res) => {
     }
 
     if (userExist.verified) {
-      return res.status(404).json({ message: "user is already verified" });
+      return res.status(409).json({ message: "user is already verified" });
     }
 
     const id = userExist._id;
