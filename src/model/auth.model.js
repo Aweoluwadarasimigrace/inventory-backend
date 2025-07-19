@@ -28,7 +28,7 @@ const authSchema = new mongoose.Schema({
   },
   profilepicture: {
     data: Buffer,
-    contentType: string,
+    contentType: String,
   },
   country: {
     type: String,
@@ -46,7 +46,7 @@ const authSchema = new mongoose.Schema({
     type:String
   },
   lastname: {
-    type:Sting
+    type:String
   },
   verified: {
     type: Boolean,
