@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Auth = require("../model/auth.model");
 const sendEmail = require("../utils/sendEmail");
-
+const bcrypt = require("bcryptjs");
 
 
 const getUserByAdmin = async(req,res)=>{
