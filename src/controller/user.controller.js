@@ -45,7 +45,7 @@ const createUserByAdmin = async (req, res) => {
     !password 
 
   ) {
-    res.status(404).json({ message: "please fill out all fields" });
+    return res.status(404).json({ message: "please fill out all fields" });
   }
 
   try {
@@ -90,6 +90,7 @@ const createUserByAdmin = async (req, res) => {
 
     const baseUrl = process.env.FRONTEND_URL;
     const verifyLink = `${baseUrl}/auth/verify-email/?token=${verifyEmailToken}`;
+    console.log(verifyEmailToken)
 
     const html = `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9;">
