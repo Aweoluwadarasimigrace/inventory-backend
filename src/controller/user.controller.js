@@ -82,10 +82,10 @@ const createUserByAdmin = async (req, res) => {
 
     const createdUser = await Auth.create(userData);
 
-    const userId = createdUser._id;
-    console.log(userId)
+    const id = createdUser._id;
+    console.log(id)
 
-    const verifyEmailToken = jwt.sign({ userId }, process.env.JWT_SECRET_KEY, {
+    const verifyEmailToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "10m",
     });
 

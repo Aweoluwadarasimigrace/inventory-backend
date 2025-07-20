@@ -120,13 +120,14 @@ const registerUser = async (req, res) => {
 const verifyEmail = async (req, res) => {
   const verifyToken = req.query.token;
   if (!verifyToken) {
-    return res.json({ message: "user nor present" });
+    return res.json({ message: "user not present" });
   }
 
   try {
     const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET_KEY);
 
     const userId = decoded.id;
+    console.log(userId, "usetg")
 
     const user = await Auth.findById(userId);
    
@@ -146,7 +147,7 @@ const verifyEmail = async (req, res) => {
   } catch (error) {
     return res
       .status(400)
-      .json({ message: "an error occured", error: error.message });
+      .json({ message: "an error occured, failed to verify", error: error.message });
   }
 };
 
