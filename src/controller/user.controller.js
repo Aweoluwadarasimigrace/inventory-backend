@@ -19,7 +19,6 @@ const getUserByAdmin = async(req,res)=>{
    }
 }
 
-
 const createUserByAdmin = async (req, res) => {
   const {
     username,
