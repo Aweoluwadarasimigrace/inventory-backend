@@ -4,20 +4,27 @@ const sendEmail = require("../utils/sendEmail");
 const bcrypt = require("bcryptjs");
 
 
-const getUserByAdmin = async(req,res)=>{
-   try {
-    const salesUser = await Auth.find({createdBy: req.user._id, verified:true})
+const getUserByAdmin = async (req, res) => {
+  try {
+    const salesUsers = await Auth.find({
+      createdBy: req.user._id,
+      role:sales,
+      verified: true,
+    });
 
-    if(!salesUser){
-        return res.status(404).json({message: "user not found"})
+    // Even if no users found, salesUsers will be an empty array, not null
+    if (salesUsers.length === 0) {
+      return res.status(404).json({ message: "No users found" });
     }
-    res.status(200).json({salesUser})
-   } catch (error) {
-      return res
+
+    res.status(200).json({ salesUsers });
+  } catch (error) {
+    return res
       .status(400)
-      .json({ message: "an error occured", error: error.message });
-   }
-}
+      .json({ message: "An error occurred", error: error.message });
+  }
+};
+
 
 const createUserByAdmin = async (req, res) => {
   const {
