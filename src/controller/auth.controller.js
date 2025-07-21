@@ -93,16 +93,6 @@ const registerUser = async (req, res) => {
 `;
 
     await sendEmail(email, "verify your account ", html);
-
-    const token = getToken(newUser._id);
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
     res.status(201).json({
       success: true,
       message:
@@ -127,10 +117,9 @@ const verifyEmail = async (req, res) => {
     const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET_KEY);
 
     const userId = decoded.id;
-    console.log(userId, "usetg")
+    console.log(userId, "usetg");
 
     const user = await Auth.findById(userId);
-   
 
     if (!user) {
       return res.status(404).json({ message: "user not found" });
@@ -143,11 +132,23 @@ const verifyEmail = async (req, res) => {
     user.verified = true;
 
     await user.save();
+
+    const token = getToken(userId);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
     return res.status(201).json({ message: "Email verified successfully!" });
   } catch (error) {
     return res
       .status(400)
-      .json({ message: "an error occured, failed to verify", error: error.message });
+      .json({
+        message: "an error occured, failed to verify",
+        error: error.message,
+      });
   }
 };
 
@@ -177,7 +178,7 @@ const resendEmail = async (req, res) => {
     const baseUrl = process.env.FRONTEND_URL;
     const verifyLink = `${baseUrl}/auth/verify-email/?token=${token}`;
 
-   const html = `
+    const html = `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9;">
     <h2 style="color: #333;">Resend: Verify Your Email Address 🔄</h2>
     <p style="font-size: 16px; color: #555;">
@@ -199,7 +200,6 @@ const resendEmail = async (req, res) => {
     </p>
   </div>
 `;
-
 
     await sendEmail(email, "verify your account", html);
     res.status(201).json({ message: "Verification email resent!" });
