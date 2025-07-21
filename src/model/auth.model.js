@@ -50,6 +50,10 @@ const authSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  createdBy:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref:Auth
+  }
 });
 
 const Auth = mongoose.model("auth", authSchema);

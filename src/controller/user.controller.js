@@ -6,12 +6,11 @@ const bcrypt = require("bcryptjs");
 
 const getUserByAdmin = async(req,res)=>{
    try {
-    const salesUser = await Auth.find({role: "sales", verified:true})
+    const salesUser = await Auth.find({createdBy: req.user._id, verified:true})
 
     if(!salesUser){
         return res.status(404).json({message: "user not found"})
     }
-
     res.status(200).json({salesUser})
    } catch (error) {
       return res
@@ -71,6 +70,7 @@ const createUserByAdmin = async (req, res) => {
       countrycode,
       password: hashedPassword,
       verified: false,
+      createdBy: req.user._id
     };
 
     if (req.file) {
