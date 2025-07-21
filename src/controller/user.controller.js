@@ -8,9 +8,10 @@ const getUserByAdmin = async (req, res) => {
   try {
     const salesUsers = await Auth.find({
       createdBy: req.user._id,
-      role:sales,
+      role:"sales",
       verified: true,
     });
+    console.log(req.user._id)
 
     // Even if no users found, salesUsers will be an empty array, not null
     if (salesUsers.length === 0) {
