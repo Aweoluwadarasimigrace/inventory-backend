@@ -3,7 +3,16 @@ const Auth = require("../model/auth.model");
 const sendEmail = require("../utils/sendEmail");
 const bcrypt = require("bcryptjs");
 
-
+const getAllUser = async(req,res)=>{
+  try {
+   const user = req.user
+   res.status(200).json({user: user, message: "success"})
+  } catch (error) {
+       return res
+      .status(400)
+      .json({ message: "An error occurred", error: error.message });
+  }
+}
 const getUserByAdmin = async (req, res) => {
   try {
     const salesUsers = await Auth.find({
@@ -137,5 +146,6 @@ const createUserByAdmin = async (req, res) => {
 
 module.exports = {
   createUserByAdmin,
-  getUserByAdmin
+  getUserByAdmin,
+  getAllUser
 };
