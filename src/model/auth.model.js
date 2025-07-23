@@ -36,8 +36,7 @@ const authSchema = new mongoose.Schema({
     required: true,
   },
   profilepicture: {
-    data: Buffer,
-    contentType: String,
+   type: String,
   },
   country: {
     type: String,

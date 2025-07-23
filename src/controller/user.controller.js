@@ -3,25 +3,25 @@ const Auth = require("../model/auth.model");
 const sendEmail = require("../utils/sendEmail");
 const bcrypt = require("bcryptjs");
 
-const getAllUser = async(req,res)=>{
+const getAllUser = async (req, res) => {
   try {
-   const user = req.user
-   console.log(user)
-   res.status(200).json({user: user, message: "success"})
+    const user = req.user;
+    console.log(user);
+    res.status(200).json({ user: user, message: "success" });
   } catch (error) {
-       return res
+    return res
       .status(400)
       .json({ message: "An error occurred", error: error.message });
   }
-}
+};
 const getUserByAdmin = async (req, res) => {
   try {
     const salesUsers = await Auth.find({
       createdBy: req.user._id,
-      role:"sales",
+      role: "sales",
       verified: true,
     });
-    console.log(req.user._id)
+    console.log(req.user._id);
 
     // Even if no users found, salesUsers will be an empty array, not null
     if (salesUsers.length === 0) {
@@ -36,7 +36,6 @@ const getUserByAdmin = async (req, res) => {
   }
 };
 
-
 const createUserByAdmin = async (req, res) => {
   const {
     username,
@@ -48,6 +47,7 @@ const createUserByAdmin = async (req, res) => {
     number,
     countrycode,
     password,
+    profilepicture,
   } = req.body;
   if (
     !username ||
@@ -58,8 +58,7 @@ const createUserByAdmin = async (req, res) => {
     !contact ||
     !number ||
     !countrycode ||
-    !password 
-
+    !password
   ) {
     return res.status(404).json({ message: "please fill out all fields" });
   }
@@ -87,20 +86,13 @@ const createUserByAdmin = async (req, res) => {
       countrycode,
       password: hashedPassword,
       verified: false,
-      createdBy: req.user._id
+      createdBy: req.user._id,
     };
-
-    if (req.file) {
-      userData.profilepicture = {
-        data: req.file.buffer,
-        contentType: req.file.mimetype,
-      };
-    }
 
     const createdUser = await Auth.create(userData);
 
     const id = createdUser._id;
-    console.log(id)
+    console.log(id);
 
     const verifyEmailToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "10m",
@@ -108,7 +100,7 @@ const createUserByAdmin = async (req, res) => {
 
     const baseUrl = process.env.FRONTEND_URL;
     const verifyLink = `${baseUrl}/auth/verify-email/?token=${verifyEmailToken}`;
-    console.log(verifyEmailToken)
+    console.log(verifyEmailToken);
 
     const html = `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9;">
@@ -142,11 +134,40 @@ const createUserByAdmin = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  const userId = req.user._id;
 
+  const { username, profilepicture } = req.body;
+  const updatedFields = {};
 
+  if (username) {
+    updatedFields.username = username;
+  }
+  if (profilepicture) {
+    updatedFields.profilepicture = profilepicture;
+  }
+
+  try {
+    const updatedUser = await Auth.findByIdAndUpdate(userId, updatedFields, {
+      new: true,
+    });
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating user", error: error.message });
+  }
+};
 
 module.exports = {
   createUserByAdmin,
   getUserByAdmin,
-  getAllUser
+  getAllUser,
+  updateUser,
 };
