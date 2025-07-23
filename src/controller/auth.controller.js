@@ -213,6 +213,7 @@ const resendEmail = async (req, res) => {
 // login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  console.log(req.body)
   try {
     const user = await Auth.findOne({ email });
 
