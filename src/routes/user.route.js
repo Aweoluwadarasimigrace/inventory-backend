@@ -4,7 +4,7 @@ const { verifyToken, verifyIsAdmin } = require("../middleware/verifytoken.middle
 const upload = require("../middleware/uploads.middleware")
 const router = express.Router()
 
-router.get("/getalluser", verifyToken, getAllUser)
+router.get("/getsingleuser", verifyToken, getAllUser)
 router.use(verifyToken, verifyIsAdmin)
 router.post("/createuser", upload.single("image") ,createUserByAdmin)
 router.get("/getuser", getUserByAdmin )
