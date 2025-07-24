@@ -138,6 +138,7 @@ const updateUser = async (req, res) => {
   const userId = req.user._id;
 
   const { username, profilepicture } = req.body;
+  console.log(profilepicture)
   const updatedFields = {};
 
   if (username) {
