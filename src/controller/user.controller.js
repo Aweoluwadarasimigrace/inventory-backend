@@ -93,9 +93,7 @@ const createUserByAdmin = async (req, res) => {
       verified: false,
       createdBy: req.user._id,
     };
-
     const createdUser = await Auth.create(userData);
-
     const id = createdUser._id;
     console.log(id);
 
@@ -171,9 +169,29 @@ const updateUser = async (req, res) => {
   }
 };
 
+
+const searchForUser = async(req, res)=>{
+   const {query}=req.query // gets whatever was typed in search box (e.g. "ade")
+   try {
+    const regex = new RegExp(query, "i")
+   const user = await Auth.find({
+    $or:[
+      {firstname: regex},
+      {lastname: regex},
+      {username: regex},
+      {email: regex}
+    ]
+   })
+
+   res.status(200).json({user})
+   } catch (error) {
+     res.status(500).json({ message: "Server error", error });
+   }
+}
 module.exports = {
   createUserByAdmin,
   getUserByAdmin,
   getAllUser,
   updateUser,
+  searchForUser
 };
