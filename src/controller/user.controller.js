@@ -48,6 +48,7 @@ const createUserByAdmin = async (req, res) => {
     countrycode,
     password,
     profilepicture,
+    gender
   } = req.body;
   if (
     !username ||
@@ -58,7 +59,9 @@ const createUserByAdmin = async (req, res) => {
     !contact ||
     !number ||
     !countrycode ||
-    !password
+    !password||
+    !profilepicture ||
+    !gender
   ) {
     return res.status(404).json({ message: "please fill out all fields" });
   }
@@ -84,6 +87,8 @@ const createUserByAdmin = async (req, res) => {
       contact,
       number,
       countrycode,
+      profilepicture, 
+      gender,
       password: hashedPassword,
       verified: false,
       createdBy: req.user._id,

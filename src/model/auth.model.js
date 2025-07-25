@@ -7,11 +7,11 @@ const authSchema = new mongoose.Schema({
   firstname: {
     type: String,
   },
-  username:{
-    type:String
+  username: {
+    type: String,
   },
   lastname: {
-    type:String
+    type: String,
   },
   email: {
     type: String,
@@ -35,25 +35,29 @@ const authSchema = new mongoose.Schema({
     minlength: 8,
     required: true,
   },
-  profilepicture: {
-   type: String,
-  },
   country: {
     type: String,
   },
+  gender: {
+    type: String,
+    enum: ["male", "female"],
+  },
   role: {
     type: String,
-    enum: ["admin", "sales"],
+    enum: ["admin", "sales representative", "product manager"],
     default: "admin",
+  },
+   profilepicture: {
+    type: String,
   },
   verified: {
     type: Boolean,
     default: false,
   },
-  createdBy:{
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Auth"
-  }
+    ref: "Auth",
+  },
 });
 
 const Auth = mongoose.model("auth", authSchema);
