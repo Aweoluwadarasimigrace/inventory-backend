@@ -5,7 +5,7 @@ export const getPdfDownload = async (req, res) => {
 
   const doc = new PDFDocument();
   //  “Hey browser! I’m sending you a PDF file — not an image, not text, not a video. Just a PDF.”
-  res.setHeader("content-Type", "application/pdf");
+  res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", 'attachment; filename="users.pdf"');
 
   doc.pipe(res)
