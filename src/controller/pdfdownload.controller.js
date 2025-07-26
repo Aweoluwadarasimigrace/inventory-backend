@@ -1,6 +1,8 @@
 import Auth from "../model/auth.model";
 const PDFDocument = require("pdfkit");
-export const getPdfDownload = async (req, res) => {
+
+
+const getPdfDownload = async (req, res) => {
   const user = await Auth.find();
 
   const doc = new PDFDocument();
@@ -19,3 +21,6 @@ export const getPdfDownload = async (req, res) => {
   })
   doc.end()
 };
+
+
+module.exports = getPdfDownload
