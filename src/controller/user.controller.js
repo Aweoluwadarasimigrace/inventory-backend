@@ -16,7 +16,7 @@ const getAllUser = async (req, res) => {
 };
 const getUserByAdmin = async (req, res) => {
   try {
-    const salesUsers = await Auth.find({
+    const salesusers = await Auth.find({
       createdBy: req.user._id,
       role: "sales",
       verified: true,
@@ -24,11 +24,11 @@ const getUserByAdmin = async (req, res) => {
     console.log(req.user._id);
 
     // Even if no users found, salesUsers will be an empty array, not null
-    if (salesUsers.length === 0) {
-      return res.status(404).json({ message: "No users found" });
+    if (salesusers.length === 0) {
+      return res.status(200).json({ salesusers:[] });
     }
 
-    res.status(200).json({ salesUsers });
+    res.status(200).json({ salesusers });
   } catch (error) {
     return res
       .status(400)
