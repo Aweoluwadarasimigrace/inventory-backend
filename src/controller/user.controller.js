@@ -18,7 +18,7 @@ const getUserByAdmin = async (req, res) => {
   try {
     const salesusers = await Auth.find({
       createdBy: req.user._id,
-      role: "sales",
+      role: {$in: ["sales representative", "product manager"]},
     });
     console.log(req.user._id);
 
