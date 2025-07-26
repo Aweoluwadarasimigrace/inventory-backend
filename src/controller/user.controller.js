@@ -19,7 +19,6 @@ const getUserByAdmin = async (req, res) => {
     const salesusers = await Auth.find({
       createdBy: req.user._id,
       role: "sales",
-      verified: true,
     });
     console.log(req.user._id);
 
