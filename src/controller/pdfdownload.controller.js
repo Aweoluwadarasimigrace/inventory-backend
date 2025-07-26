@@ -1,4 +1,4 @@
-import Auth from "../model/auth.model";
+const Auth = require("../model/auth.model")
 const PDFDocument = require("pdfkit");
 
 
