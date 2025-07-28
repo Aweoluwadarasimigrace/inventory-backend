@@ -1,5 +1,5 @@
 const express = require("express")
-const { createUserByAdmin, getUserByAdmin, getAllUser, updateUser, searchForUser } = require("../controller/user.controller")
+const { createUserByAdmin, getUserByAdmin, getAllUser, updateUser, searchForUser, updateUserByAdmin } = require("../controller/user.controller")
 const { verifyToken, verifyIsAdmin } = require("../middleware/verifytoken.middleware")
 const router = express.Router()
 
@@ -10,6 +10,7 @@ router.patch("/updateUser", updateUser)
 router.use(verifyIsAdmin)
 router.post("/createuser",createUserByAdmin)
 router.get("/getuser", getUserByAdmin ),
+router.post("/updateuserbyadmin", updateUserByAdmin)
 
 
 

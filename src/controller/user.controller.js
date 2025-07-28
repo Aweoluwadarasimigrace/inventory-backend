@@ -136,6 +136,20 @@ const createUserByAdmin = async (req, res) => {
   }
 };
 
+const updateUserByAdmin = async(req,res)=>{
+  const userId = req.user._id
+const body = req.body
+  try {
+    const updateduser = await Auth.findOneAndUpdate({createdBy: userId}, body, {new:true})
+if(!updateduser){
+   return res.status(404).json({ message: "User not found or unauthorized" });
+}
+ res.status(200).json({ message: "User updated", user: updateduser });
+  } catch (error) {
+      res.status(500).json({ message: "Update failed", error: error.message });
+  }
+}
+
 const updateUser = async (req, res) => {
   const userId = req.user._id;
 
@@ -192,5 +206,6 @@ module.exports = {
   getUserByAdmin,
   getAllUser,
   updateUser,
-  searchForUser
+  searchForUser,
+  updateUserByAdmin
 };
