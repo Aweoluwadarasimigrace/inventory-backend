@@ -5,6 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const app = express();
 const http = require("http");
+const { Server } = require("socket.io");
 
 // Middleware
 app.use(express.json({ limit: "30mb" }));
@@ -22,9 +23,7 @@ app.use(
 
 // creating http server and socket.io server
 const server = http.createServer(app);
-
-const { server } = require("socket.io");
-const io = new server(server, {
+const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5174",
