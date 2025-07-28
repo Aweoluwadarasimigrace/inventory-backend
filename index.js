@@ -60,7 +60,7 @@ mongoose
   .then(() => {
     console.log("✅ MongoDB connected");
 
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`🚀 Server is running on port ${port}`);
     });
   })
