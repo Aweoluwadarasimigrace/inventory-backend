@@ -2,12 +2,13 @@ const jwt = require("jsonwebtoken");
 const Auth = require("../model/auth.model");
 const sendEmail = require("../utils/sendEmail");
 const bcrypt = require("bcryptjs");
+const { sendNotification } = require("../socket/socket");
 
 const getAllUser = async (req, res) => {
   try {
     const user = req.user;
     console.log(user);
-    
+
     res.status(200).json({ user: user, message: "success" });
   } catch (error) {
     return res
@@ -94,6 +95,8 @@ const createUserByAdmin = async (req, res) => {
       createdBy: req.user._id,
     };
     const createdUser = await Auth.create(userData);
+
+    sendNotification(`New user created: ${username}`)
     const id = createdUser._id;
     console.log(id);
 
@@ -172,6 +175,7 @@ const updateUser = async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
+    sendNotification(`user updated successfully: ${updatedUser.username}`)
     res.status(200).json({
       message: "User updated successfully",
       user: updatedUser,

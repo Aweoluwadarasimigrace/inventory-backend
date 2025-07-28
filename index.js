@@ -2,30 +2,49 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
 const app = express();
-
+const http = require("http");
+const { server } = require("socket.io");
 // Middleware
-app.use(express.json({limit:"30mb"}));
+app.use(express.json({ limit: "30mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(cors({
-  origin: [
-    "http://localhost:5173", 
-     "http://localhost:5174", 
-    "http://localhost:5176",
-    "https://inventory-frontend-woad-ten.vercel.app"
-  ],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5174",
+      "http://localhost:5176",
+      "https://inventory-frontend-woad-ten.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 
-app.use(cookieParser())
+// creating http server and socket.io server
+const server = http.createServer(app);
+const io = new server(server, {
+  cors: {
+    origin: [
+      "http://localhost:5174",
+      "http://localhost:5176",
+      "https://inventory-frontend-woad-ten.vercel.app",
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+
+newSocket(io)
+app.use(cookieParser());
 // Routes
 const authRoute = require("./src/routes/auth.route");
 const userRoute = require("./src/routes/user.route");
 const pdfRoute = require("./src/routes/pdfdownload.route");
+const { newSocket } = require("./src/socket/socket");
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", userRoute);
-app.use("/api", pdfRoute)
+app.use("/api", pdfRoute);
 // Health check route (for Render to confirm it works)
 app.get("/", (req, res) => {
   res.send("✅ Backend is running on Render");
