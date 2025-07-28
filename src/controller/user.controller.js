@@ -7,6 +7,7 @@ const getAllUser = async (req, res) => {
   try {
     const user = req.user;
     console.log(user);
+    
     res.status(200).json({ user: user, message: "success" });
   } catch (error) {
     return res
@@ -20,7 +21,7 @@ const getUserByAdmin = async (req, res) => {
       createdBy: req.user._id,
       role: {$in: ["sales representative", "product manager"]},
     });
-    console.log(req.user._id);
+   
 
     // Even if no users found, salesUsers will be an empty array, not null
     if (salesusers.length === 0) {

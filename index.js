@@ -11,6 +11,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cors({
   origin: [
     "http://localhost:5173", 
+     "http://localhost:5174", 
     "http://localhost:5176",
     "https://inventory-frontend-woad-ten.vercel.app"
   ],
