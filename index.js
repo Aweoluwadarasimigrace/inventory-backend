@@ -6,7 +6,10 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
-
+const authRoute = require("./src/routes/auth.route");
+const userRoute = require("./src/routes/user.route");
+const pdfRoute = require("./src/routes/pdfdownload.route");
+const { newSocket } = require("./src/socket/socket");
 // Middleware
 app.use(express.json({ limit: "30mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -39,10 +42,6 @@ const io = new Server(server, {
 newSocket(io)
 app.use(cookieParser());
 // Routes
-const authRoute = require("./src/routes/auth.route");
-const userRoute = require("./src/routes/user.route");
-const pdfRoute = require("./src/routes/pdfdownload.route");
-const { newSocket } = require("./src/socket/socket");
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api", pdfRoute);
