@@ -4,15 +4,9 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const app = express();
-const http = require("http");
-const { Server } = require("socket.io");
-const authRoute = require("./src/routes/auth.route");
-const userRoute = require("./src/routes/user.route");
-const pdfRoute = require("./src/routes/pdfdownload.route");
-const { newSocket } = require("./src/socket/socket");
 // Middleware
-app.use(express.json({ limit: "30mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(
   cors({
     origin: [
@@ -24,24 +18,13 @@ app.use(
   })
 );
 
-// creating http server and socket.io server
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: [
-      "http://localhost:5174",
-      "http://localhost:5176",
-      "https://inventory-frontend-woad-ten.vercel.app",
-    ],
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
 
 
-newSocket(io)
 app.use(cookieParser());
 // Routes
+const authRoute = require("./src/routes/auth.route");
+const userRoute = require("./src/routes/user.route");
+const pdfRoute = require("./src/routes/pdfdownload.route");
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api", pdfRoute);
@@ -60,7 +43,7 @@ mongoose
   .then(() => {
     console.log("✅ MongoDB connected");
 
-    server.listen(port, () => {
+    app.listen(port, () => {
       console.log(`🚀 Server is running on port ${port}`);
     });
   })

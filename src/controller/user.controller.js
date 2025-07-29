@@ -2,7 +2,8 @@ const jwt = require("jsonwebtoken");
 const Auth = require("../model/auth.model");
 const sendEmail = require("../utils/sendEmail");
 const bcrypt = require("bcryptjs");
-const { sendNotification } = require("../socket/socket");
+const pusher = require("../pusher/pusher");
+const sendNotification = require("../pusher/sendnotificaion");
 
 const getAllUser = async (req, res) => {
   try {
@@ -20,13 +21,12 @@ const getUserByAdmin = async (req, res) => {
   try {
     const salesusers = await Auth.find({
       createdBy: req.user._id,
-      role: {$in: ["sales representative", "product manager"]},
+      role: { $in: ["sales representative", "product manager"] },
     });
-   
 
     // Even if no users found, salesUsers will be an empty array, not null
     if (salesusers.length === 0) {
-      return res.status(200).json({ salesusers:[] });
+      return res.status(200).json({ salesusers: [] });
     }
 
     res.status(200).json({ salesusers });
@@ -49,7 +49,7 @@ const createUserByAdmin = async (req, res) => {
     countrycode,
     password,
     profilepicture,
-    gender
+    gender,
   } = req.body;
   if (
     !username ||
@@ -60,7 +60,7 @@ const createUserByAdmin = async (req, res) => {
     !contact ||
     !number ||
     !countrycode ||
-    !password||
+    !password ||
     !profilepicture ||
     !gender
   ) {
@@ -88,7 +88,7 @@ const createUserByAdmin = async (req, res) => {
       contact,
       number,
       countrycode,
-      profilepicture, 
+      profilepicture,
       gender,
       password: hashedPassword,
       verified: false,
@@ -96,7 +96,7 @@ const createUserByAdmin = async (req, res) => {
     };
     const createdUser = await Auth.create(userData);
 
-    sendNotification(`New user created: ${username}`)
+    sendNotification(`successfully created! : ${userData.username}`);
     const id = createdUser._id;
     console.log(id);
 
@@ -140,25 +140,33 @@ const createUserByAdmin = async (req, res) => {
   }
 };
 
-const updateUserByAdmin = async(req,res)=>{
-  const userId = req.user._id
-const body = req.body
+const updateUserByAdmin = async (req, res) => {
+  const userId = req.user._id;
+  const body = req.body;
   try {
-    const updateduser = await Auth.findOneAndUpdate({createdBy: userId}, body, {new:true})
-if(!updateduser){
-   return res.status(404).json({ message: "User not found or unauthorized" });
-}
- res.status(200).json({ message: "User updated", user: updateduser });
+    const updateduser = await Auth.findOneAndUpdate(
+      { createdBy: userId },
+      body,
+      { new: true }
+    );
+    if (!updateduser) {
+      return res
+        .status(404)
+        .json({ message: "User not found or unauthorized" });
+    }
+
+    sendNotification(`updated successfull! : ${updateduser.username}`);
+    res.status(200).json({ message: "User updated", user: updateduser });
   } catch (error) {
-      res.status(500).json({ message: "Update failed", error: error.message });
+    res.status(500).json({ message: "Update failed", error: error.message });
   }
-}
+};
 
 const updateUser = async (req, res) => {
   const userId = req.user._id;
 
   const { username, profilepicture } = req.body;
-  console.log(profilepicture)
+  console.log(profilepicture);
   const updatedFields = {};
 
   if (username) {
@@ -175,7 +183,7 @@ const updateUser = async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
-    sendNotification(`user updated successfully: ${updatedUser.username}`)
+    sendNotification(`successfully created! : ${updatedUser.username}`);
     res.status(200).json({
       message: "User updated successfully",
       user: updatedUser,
@@ -187,30 +195,29 @@ const updateUser = async (req, res) => {
   }
 };
 
+const searchForUser = async (req, res) => {
+  const { query } = req.query; // gets whatever was typed in search box (e.g. "ade")
+  try {
+    const regex = new RegExp(query, "i");
+    const user = await Auth.find({
+      $or: [
+        { firstname: regex },
+        { lastname: regex },
+        { username: regex },
+        { email: regex },
+      ],
+    });
 
-const searchForUser = async(req, res)=>{
-   const {query}=req.query // gets whatever was typed in search box (e.g. "ade")
-   try {
-    const regex = new RegExp(query, "i")
-   const user = await Auth.find({
-    $or:[
-      {firstname: regex},
-      {lastname: regex},
-      {username: regex},
-      {email: regex}
-    ]
-   })
-
-   res.status(200).json({user})
-   } catch (error) {
-     res.status(500).json({ message: "Server error", error });
-   }
-}
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
 module.exports = {
   createUserByAdmin,
   getUserByAdmin,
   getAllUser,
   updateUser,
   searchForUser,
-  updateUserByAdmin
+  updateUserByAdmin,
 };
