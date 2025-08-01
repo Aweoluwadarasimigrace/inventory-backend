@@ -8,8 +8,6 @@ const sendNotification = require("../pusher/sendnotificaion");
 const getAllUser = async (req, res) => {
   try {
     const user = req.user;
-    console.log(user);
-
     res.status(200).json({ user: user, message: "success" });
   } catch (error) {
     return res
@@ -98,7 +96,6 @@ const createUserByAdmin = async (req, res) => {
 
     sendNotification(`successfully created! : ${userData.username}`);
     const id = createdUser._id;
-    console.log(id);
 
     const verifyEmailToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "10m",
@@ -106,7 +103,7 @@ const createUserByAdmin = async (req, res) => {
 
     const baseUrl = process.env.FRONTEND_URL;
     const verifyLink = `${baseUrl}/auth/verify-email/?token=${verifyEmailToken}`;
-    console.log(verifyEmailToken);
+  
 
     const html = `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9;">

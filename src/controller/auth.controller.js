@@ -65,7 +65,6 @@ const registerUser = async (req, res) => {
     const verifyEmailToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "10m",
     });
-    console.log(verifyEmailToken);
     const baseUrl = process.env.FRONTEND_URL;
     const verifyLink = `${baseUrl}/auth/verify-email/?token=${verifyEmailToken}`;
 
@@ -117,8 +116,7 @@ const verifyEmail = async (req, res) => {
     const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET_KEY);
 
     const userId = decoded.id;
-    console.log(userId, "usetg");
-
+  
     const user = await Auth.findById(userId);
 
     if (!user) {
