@@ -252,6 +252,11 @@ const loginUser = async (req, res) => {
       .json({ message: "an error occured", error: error.message });
   }
 };
+const verifySession = async (req, res) => {
+  return res.status(200).json({
+    message: "session is valid",
+  });
+}
 
 const logOut = async (req, res) => {
   try {
@@ -274,4 +279,5 @@ module.exports = {
   verifyEmail,
   resendEmail,
   logOut,
+  verifySession
 };
