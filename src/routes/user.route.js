@@ -1,5 +1,5 @@
 const express = require("express")
-const { createUserByAdmin, getUserByAdmin, getAllUser, updateUser, searchForUser, updateUserByAdmin } = require("../controller/user.controller")
+const { createUserByAdmin, getUserByAdmin, getAllUser, updateUser, searchForUser, updateUserByAdmin, deleteUser } = require("../controller/user.controller")
 const { verifyToken, verifyIsAdmin } = require("../middleware/verifytoken.middleware")
 const router = express.Router()
 
@@ -11,6 +11,7 @@ router.use(verifyIsAdmin)
 router.post("/createuser",createUserByAdmin)
 router.get("/getuser", getUserByAdmin ),
 router.post("/updateuserbyadmin", updateUserByAdmin)
+router.delete("/deleteuser/:id", deleteUser)
 
 
 

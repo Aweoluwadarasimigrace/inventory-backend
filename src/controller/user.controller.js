@@ -103,7 +103,6 @@ const createUserByAdmin = async (req, res) => {
 
     const baseUrl = process.env.FRONTEND_URL;
     const verifyLink = `${baseUrl}/auth/verify-email/?token=${verifyEmailToken}`;
-  
 
     const html = `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9;">
@@ -194,6 +193,10 @@ const updateUser = async (req, res) => {
 
 const searchForUser = async (req, res) => {
   const { query } = req.query; // gets whatever was typed in search box (e.g. "ade")
+  if (!query) {
+    return res.status(400).json({ message: "Search query is required." });
+  }
+
   try {
     const regex = new RegExp(query, "i");
     const user = await Auth.find({
@@ -210,6 +213,35 @@ const searchForUser = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
+const deleteUser = async (req, res) => {
+  const userId = req.params.id;
+  const adminId = req.user._id;
+
+  try {
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+if(!adminId) {
+      return res.status(403).json({ message: "Unauthorized action" });
+    }
+    const deletedUser = await Auth.findOneAndDelete({
+      _id: userId,
+      createdBy: adminId,
+    });
+    if (!deletedUser) {
+      return res
+        .status(404)
+        .json({ message: "User not found or unauthorized" });
+    }
+    sendNotification(`successfully deleted! : ${deletedUser.username}`);
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error deleting user", error: error.message });
+  }
+};
 module.exports = {
   createUserByAdmin,
   getUserByAdmin,
@@ -217,4 +249,5 @@ module.exports = {
   updateUser,
   searchForUser,
   updateUserByAdmin,
+  deleteUser,
 };
