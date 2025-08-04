@@ -196,7 +196,7 @@ const searchForUser = async (req, res) => {
   if (!query) {
     return res.status(400).json({ message: "Search query is required." });
   }
-
+console.log(query)
   try {
     const regex = new RegExp(query, "i");
     const user = await Auth.find({
