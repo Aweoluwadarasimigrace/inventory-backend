@@ -17,7 +17,7 @@ const getPdfDownload = async (req, res) => {
   user.forEach((user, index)=>{
      doc
     .fontSize(12)
-    .text(`${index + 1}. ${user.firstName} ${user.lastName} - ${user.email}`);
+    .text(`${index + 1}. ${user.firstname} ${user.lastname} - ${user.email}`);
   })
   doc.end()
 };
