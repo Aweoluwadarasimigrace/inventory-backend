@@ -27,7 +27,7 @@ const userRoute = require("./src/routes/user.route");
 const pdfRoute = require("./src/routes/pdfdownload.route");
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", userRoute);
-app.use("/api", pdfRoute);
+app.use("/api/v1/pdf", pdfRoute);
 // Health check route (for Render to confirm it works)
 app.get("/", (req, res) => {
   res.send("✅ Backend is running on Render");
