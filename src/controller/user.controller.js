@@ -138,11 +138,28 @@ const createUserByAdmin = async (req, res) => {
 
 const updateUserByAdmin = async (req, res) => {
   const userId = req.user._id;
-  const body = req.body;
+  const { id } = req.params;
+  const { username, contact, number, countrycode, profilepicture } = req.body;
+  const updateuser = {};
+  if (contact) {
+    updateuser.contact = contact;
+  }
+  if (number) {
+    updateuser.number = number;
+  }
+  if (countrycode) {
+    updateuser.countrycode = countrycode;
+  }
+  if (profilepicture) {
+    updateuser.profilepicture = profilepicture;
+  }
+  if (username) {
+    updateuser.username = username;
+  }
   try {
     const updateduser = await Auth.findOneAndUpdate(
-      { createdBy: userId },
-      body,
+      { createdBy: userId, _id: id },
+      updateuser,
       { new: true }
     );
     if (!updateduser) {
@@ -161,13 +178,10 @@ const updateUserByAdmin = async (req, res) => {
 const updateUser = async (req, res) => {
   const userId = req.user._id;
 
-  const { username, profilepicture } = req.body;
+  const { profilepicture } = req.body;
   console.log(profilepicture);
   const updatedFields = {};
 
-  if (username) {
-    updatedFields.username = username;
-  }
   if (profilepicture) {
     updatedFields.profilepicture = profilepicture;
   }
@@ -196,7 +210,7 @@ const searchForUser = async (req, res) => {
   if (!query) {
     return res.status(400).json({ message: "Search query is required." });
   }
-console.log(query)
+  console.log(query);
   try {
     const regex = new RegExp(query, "i");
     const user = await Auth.find({
@@ -222,7 +236,7 @@ const deleteUser = async (req, res) => {
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
     }
-if(!adminId) {
+    if (!adminId) {
       return res.status(403).json({ message: "Unauthorized action" });
     }
     const deletedUser = await Auth.findOneAndDelete({

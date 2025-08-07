@@ -10,7 +10,7 @@ router.patch("/updateUser", updateUser)
 router.use(verifyIsAdmin)
 router.post("/createuser",createUserByAdmin)
 router.get("/getuser", getUserByAdmin ),
-router.post("/updateuserbyadmin", updateUserByAdmin)
+router.patch("/updateuserbyadmin/:id", updateUserByAdmin)
 router.delete("/deleteuser/:id", deleteUser)
 
 
