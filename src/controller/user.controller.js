@@ -139,6 +139,7 @@ const createUserByAdmin = async (req, res) => {
 const updateUserByAdmin = async (req, res) => {
   const userId = req.user._id;
   const { id } = req.params;
+  console.log(req.body)
   const { username, contact, number, countrycode, profilepicture } = req.body;
   const updateuser = {};
   if (contact) {
