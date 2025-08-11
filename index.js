@@ -25,9 +25,11 @@ app.use(cookieParser());
 const authRoute = require("./src/routes/auth.route");
 const userRoute = require("./src/routes/user.route");
 const pdfRoute = require("./src/routes/pdfdownload.route");
+const customerRoute = require("./src/routes/customer.route")
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/pdf", pdfRoute);
+app.use("api/v1/customer", customerRoute)
 // Health check route (for Render to confirm it works)
 app.get("/", (req, res) => {
   res.send("✅ Backend is running on Render");
