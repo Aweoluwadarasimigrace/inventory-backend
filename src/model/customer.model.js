@@ -36,6 +36,16 @@ const customerSchema = new mongoose.Schema({
   country: {
     type: String,
   },
+  teamAdmin:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Auth",
+    required: true
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"Auth",
+    required: true
+  }
 });
 
 

@@ -1,17 +1,197 @@
-const Customer = require("../model/customer.model")
+const Customer = require("../model/customer.model");
 
-const getAllCustomer = async(req, res)=>{
-    try {
-        const customer = await Customer.find()
-        if(!customer){
-            return res.status(400).json({message: "user not found"})
-        }
-        res.status(200).json(customer)
-    } catch (error) {
-       return res.status(400).json({ message: "An error occurred", error: error.message })
+const getAllCustomer = async (req, res) => {
+  try {
+    let teamAdminId;
+
+    if (req.user.role === "admin") {
+      teamAdminId = req.user._id;
+    } else if (req.user.role === "sales representative" || "product manager") {
+      teamAdminId = req.user.createdBy;
     }
-}
+    const customer = await Customer.find({ teamAdmin: teamAdminId });
+    if (customer.length === 0) {
+      return res.status(400).json({ message: "user not found" });
+    }
+    res.status(200).json(customer);
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: "An error occurred", error: error.message });
+  }
+};
 
+const createCustomer = async (req, res) => {
+  const {
+    firstname,
+    lastname,
+    email,
+    contact,
+    number,
+    countrycode,
+    address,
+    city,
+    state,
+    country,
+  } = req.body;
+
+  if (
+    !firstname ||
+    !lastname ||
+    !email ||
+    !contact ||
+    !number ||
+    !countrycode ||
+    !address ||
+    !city ||
+    !state ||
+    !country
+  ) {
+    return res.status(404).json({ message: "please fill out all fields" });
+  }
+
+  try {
+    const existingCustomer = await Customer.findOne({ email });
+    if (existingCustomer) {
+      return res.status(400).json({
+        status: "FAILED",
+        message: "User Already Registered",
+      });
+    }
+    // this is the admin id that is join them together
+
+    let teamAdminId;
+
+    if (req.user.role === "admin") {
+      teamAdminId = req.user._id;
+    } else if (
+      req.user.role === "sales representative" ||
+      req.user.role === "product manager"
+    ) {
+      teamAdminId = req.user.createdBy;
+    }
+
+    const customerData = {
+      firstname,
+      lastname,
+      email,
+      contact,
+      number,
+      countrycode,
+      address,
+      city,
+      state,
+      country,
+      teamAdmin: teamAdminId,
+      createdBy: req.user._id,
+    };
+
+    const createdCustomer = await Customer.create(customerData);
+
+    res
+      .status(201)
+      .json({ message: "user created successfully", createdCustomer });
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: "an error occured", error: error.message });
+  }
+};
+
+const editCustomer = async (req, res) => {
+  const { id } = req.params;
+  const { contact, number, countrycode, address, city, state, country } =
+    req.body;
+  const updateCustomer = {};
+
+  let teamAdminId;
+
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
+
+  if (contact) {
+    updateCustomer.contact = contact;
+  }
+
+  if (number) {
+    updateCustomer.number = number;
+  }
+  if (countrycode) {
+    updateCustomer.countrycode = countrycode;
+  }
+  if (address) {
+    updateCustomer.address = address;
+  }
+  if (city) {
+    updateCustomer.city = city;
+  }
+  if (state) {
+    updateCustomer.state = state;
+  }
+  if (country) {
+    updateCustomer.country = country;
+  }
+  try {
+    const updatedCustomer = await Customer.findByIdAndUpdate(
+      { _id: id, teamAdmin: teamAdminId },
+      updateCustomer,
+      { new: true }
+    );
+
+    if (!updatedCustomer) {
+      return res
+        .status(404)
+        .json({ message: "User not found or unauthorized" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "User updated", customer: updatedCustomer });
+  } catch (error) {
+    res.status(500).json({ message: "Update failed", error: error.message });
+  }
+};
+
+const deleteCustomer = async (req, res) => {
+  const { id } = req.params;
+  let teamAdminId;
+
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
+
+  try {
+    const deleteCustomer = await Customer.findByIdAndDelete({
+      _id: id,
+      teamAdmin: teamAdminId,
+    });
+    if (!deleteCustomer) {
+      return res
+        .status(404)
+        .json({ message: "customer not found or unauthorized" });
+    }
+
+    res.status(200).json({ message: "customer deleted successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error deleting user", error: error.message });
+  }
+};
 module.exports = {
-    getAllCustomer
-}
+  getAllCustomer,
+  createCustomer,
+  editCustomer,
+  deleteCustomer,
+};
