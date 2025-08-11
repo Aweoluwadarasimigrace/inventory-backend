@@ -4,6 +4,6 @@ const { getAllCustomer } = require("../controller/customer.controller")
 
 const router = express.Router()
 router.use(verifyToken)
-router.get("/", getAllCustomer)
+router.get("/getallcustomer", getAllCustomer)
 
 module.exports = router
