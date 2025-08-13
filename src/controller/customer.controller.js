@@ -34,7 +34,7 @@ const createCustomer = async (req, res) => {
     state,
     city,
   } = req.body;
-
+  console.log(req.body);
   if (
     !firstname ||
     !lastname ||
@@ -43,9 +43,7 @@ const createCustomer = async (req, res) => {
     !number ||
     !countrycode ||
     !address ||
-    !country||
-    !state ||
-     !city
+    !country
   ) {
     return res.status(404).json({ message: "please fill out all fields" });
   }
