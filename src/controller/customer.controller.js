@@ -137,7 +137,7 @@ const editCustomer = async (req, res) => {
     updateCustomer.country = country || "";
   }
   try {
-    const updatedCustomer = await Customer.findByIdAndUpdate(
+    const updatedCustomer = await Customer.findOneAndUpdate(
       { _id: id, teamAdmin: teamAdminId },
       updateCustomer,
       { new: true }
