@@ -100,6 +100,7 @@ const editCustomer = async (req, res) => {
   const { id } = req.params;
   const { contact, number, countrycode, address, city, state, country } =
     req.body;
+    console.log(req.body)
   const updateCustomer = {};
 
   let teamAdminId;
