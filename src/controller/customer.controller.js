@@ -115,26 +115,26 @@ const editCustomer = async (req, res) => {
   }
 
   if (contact) {
-    updateCustomer.contact = contact;
+    updateCustomer.contact = contact || "";
   }
 
   if (number) {
-    updateCustomer.number = number;
+    updateCustomer.number = number || "";
   }
   if (countrycode) {
-    updateCustomer.countrycode = countrycode;
+    updateCustomer.countrycode = countrycode || "";
   }
   if (address) {
-    updateCustomer.address = address;
+    updateCustomer.address = address || "";
   }
   if (city) {
-    updateCustomer.city = city;
+    updateCustomer.city = city || "";
   }
   if (state) {
-    updateCustomer.state = state;
+    updateCustomer.state = state || "";
   }
   if (country) {
-    updateCustomer.country = country;
+    updateCustomer.country = country || "";
   }
   try {
     const updatedCustomer = await Customer.findByIdAndUpdate(
@@ -149,9 +149,7 @@ const editCustomer = async (req, res) => {
         .json({ message: "User not found or unauthorized" });
     }
 
-    res
-      .status(200)
-      .json({ message: "User updated", customer: updatedCustomer });
+    res.status(200).json({ message: "User updated", customer: updatedCustomer });
   } catch (error) {
     res.status(500).json({ message: "Update failed", error: error.message });
   }
