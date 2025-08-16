@@ -25,7 +25,7 @@ const getAllProduct = async (req, res) => {
       .sort({ createdAt: -1 });
 
     if (products.length === 0) {
-      return res.status(400).json({ message: "product not found" });
+      return res.status(400).json({ message: "no product created yet" });
     }
 
     return res.status(200).json({
@@ -43,7 +43,7 @@ const getAllProduct = async (req, res) => {
 
 const createProduct = async (req, res) => {
   const { name, category, sku, quantity, price, description } = req.body;
-
+  console.log(req.body);
   try {
     let teamAdminId;
 
@@ -60,15 +60,20 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ error: "No image uploaded" });
     }
 
+    // Upload to cloudinary
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         { folder: "products" },
-        (err, uploadResult) => (err ? reject(err) : resolve(uploadResult))
+        (err, uploadResult) => {
+          if (err) {
+            console.error("Cloudinary error:", err);
+            return reject(err);
+          }
+          resolve(uploadResult);
+        }
       );
-
       streamifier.createReadStream(req.file.buffer).pipe(stream);
     });
-
     const payload = {
       name,
       category,
@@ -76,14 +81,12 @@ const createProduct = async (req, res) => {
       quantity,
       price,
       description,
+        image: result.secure_url,
       teamAdmin: teamAdminId,
       createdBy: req.user._id,
     };
 
-    const products = await Product.create({
-      ...payload,
-      image: result.secure_url,
-    });
+    const products = await Product.create(payload);
 
     res.status(201).json(products);
   } catch (error) {
