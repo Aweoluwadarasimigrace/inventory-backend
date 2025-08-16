@@ -26,7 +26,7 @@ const authRoute = require("./src/routes/auth.route");
 const userRoute = require("./src/routes/user.route");
 const pdfRoute = require("./src/routes/pdfdownload.route");
 const customerRoute = require("./src/routes/customer.route")
-const productRoute = require("./src/routes/customer.route")
+const productRoute = require("./src/routes/product.route")
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/pdf", pdfRoute);
