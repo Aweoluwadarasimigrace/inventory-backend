@@ -6,12 +6,12 @@ const getAllCustomer = async (req, res) => {
 
     if (req.user.role === "admin") {
       teamAdminId = req.user._id;
-    } else if (req.user.role === "sales representative" || "product manager") {
+    } else if (req.user.role === "sales representative" ||  req.user.role === "product manager") {
       teamAdminId = req.user.createdBy;
     }
     const customer = await Customer.find({ teamAdmin: teamAdminId });
     if (customer.length === 0) {
-      return res.status(400).json({ message: "user not found" });
+      return res.status(400).json({ message: "customer not found" });
     }
     res.status(200).json(customer);
   } catch (error) {
