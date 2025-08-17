@@ -135,9 +135,7 @@ const updateProduct = async (req, res) => {
       return res.status(404).json({ message: "failed to update product" });
     }
 
-    res
-      .status(200)
-      .jsonO({ message: "product updated", product: updatedProduct });
+    res.status(200).json({ message: "product updated", product: updatedProduct });
   } catch (error) {
     res.status(500).json({ message: "Update failed", error: error.message });
   }
