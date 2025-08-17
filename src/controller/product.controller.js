@@ -155,7 +155,7 @@ const deleteProduct = async (req, res) => {
   }
 
   try {
-    const deletedProduct = await Product.findByIdAndUpdate({
+    const deletedProduct = await Product.findByIdAndDelete({
       _id: id,
       teamAdmin: teamAdminId,
     });
