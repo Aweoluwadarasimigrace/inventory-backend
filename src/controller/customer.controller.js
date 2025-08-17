@@ -98,6 +98,10 @@ const createCustomer = async (req, res) => {
 
 const editCustomer = async (req, res) => {
   const { id } = req.params;
+  console.log(id);
+  if (!id) {
+    return res.status(400).json({ message: "id is required" });
+  }
   const { contact, number, countrycode, address, city, state, country } =
     req.body;
     console.log(req.body)
