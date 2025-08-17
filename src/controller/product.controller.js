@@ -44,6 +44,7 @@ const getAllProduct = async (req, res) => {
 const createProduct = async (req, res) => {
   const { name, category, sku, quantity, price, description } = req.body;
   console.log(req.body);
+  console.log(req.file);
   try {
     let teamAdminId;
 
@@ -61,23 +62,34 @@ const createProduct = async (req, res) => {
     }
 
     // Upload to cloudinary
-  if(req.file){
+    let imageUrl = null;
+
+    if (req.file) {
+      console.log("Uploading to Cloudinary...");
+
       const result = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "products" },
-        (err, uploadResult) => {
-          if (err) {
-            console.error("Cloudinary error:", err);
-            return reject(err);
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "products" },
+          (err, uploadResult) => {
+            if (err) {
+              console.error("Cloudinary error:", err);
+              return reject(err);
+            }
+            console.log("Cloudinary upload result:", uploadResult);
+            resolve(uploadResult);
           }
-          resolve(uploadResult);
-        }
-        
-      );
-      streamifier.createReadStream(req.file.buffer).pipe(stream);
-    });
-    imageUrl = result.secure_url;
-  }
+        );
+
+        stream.on("error", (e) => {
+          console.error("Stream error:", e);
+          reject(e);
+        });
+
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+
+      imageUrl = result.secure_url;
+    }
     const payload = {
       name,
       category,
@@ -85,7 +97,7 @@ const createProduct = async (req, res) => {
       quantity,
       price,
       description,
-        image: imageUrl,
+      image: imageUrl,
       teamAdmin: teamAdminId,
       createdBy: req.user._id,
     };
