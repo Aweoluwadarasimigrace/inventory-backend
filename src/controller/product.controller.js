@@ -57,10 +57,6 @@ const createProduct = async (req, res) => {
       teamAdminId = req.user.createdBy;
     }
 
-    if (!req.file) {
-      return res.status(400).json({ error: "No image uploaded" });
-    }
-
     // Upload to cloudinary
     let imageUrl = null;
 
