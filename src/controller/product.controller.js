@@ -61,7 +61,8 @@ const createProduct = async (req, res) => {
     }
 
     // Upload to cloudinary
-    const result = await new Promise((resolve, reject) => {
+  if(req.file){
+      const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         { folder: "products" },
         (err, uploadResult) => {
@@ -71,9 +72,12 @@ const createProduct = async (req, res) => {
           }
           resolve(uploadResult);
         }
+        
       );
       streamifier.createReadStream(req.file.buffer).pipe(stream);
     });
+    imageUrl = result.secure_url;
+  }
     const payload = {
       name,
       category,
@@ -81,7 +85,7 @@ const createProduct = async (req, res) => {
       quantity,
       price,
       description,
-        image: result.secure_url,
+        image: imageUrl,
       teamAdmin: teamAdminId,
       createdBy: req.user._id,
     };
