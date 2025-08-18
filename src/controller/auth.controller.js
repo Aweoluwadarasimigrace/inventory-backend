@@ -97,6 +97,7 @@ const registerUser = async (req, res) => {
       message:
         "successfully created user, please verify your email  to proceed",
       data: newUser,
+      token: verifyEmailToken,
     });
   } catch (error) {
     return res
