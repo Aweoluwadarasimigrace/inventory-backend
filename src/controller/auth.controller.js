@@ -257,6 +257,5 @@ module.exports = {
   registerUser,
   verifyEmail,
   resendEmail,
-  logOut,
-  verifySession
+  logOut
 };
