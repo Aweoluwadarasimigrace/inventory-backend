@@ -1,6 +1,5 @@
 const Product = require("../model/product.model");
-const uploadToCloudinary = require("../utils/cloudinary.config")
-
+const uploadToCloudinary = require("../utils/cloudinary.config");
 
 const getAllProduct = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -135,7 +134,9 @@ const updateProduct = async (req, res) => {
       return res.status(404).json({ message: "failed to update product" });
     }
 
-    res.status(200).json({ message: "product updated", product: updatedProduct });
+    res
+      .status(200)
+      .json({ message: "product updated", product: updatedProduct });
   } catch (error) {
     res.status(500).json({ message: "Update failed", error: error.message });
   }
@@ -170,9 +171,46 @@ const deleteProduct = async (req, res) => {
       .json({ message: "Error deleting user", error: error.message });
   }
 };
+
+const getPdfDownloadProduct = async (req, res) => {
+  let teamAdminId;
+
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
+
+  const products = await Product.find({ teamAdmin: teamAdminId });
+
+  const doc = new PDFDocument();
+  //  “Hey browser! I’m sending you a PDF file — not an image, not text, not a video. Just a PDF.”
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", 'attachment; filename="users.pdf"');
+
+  doc.pipe(res);
+
+  doc.fontSize(20).text("user's list", { underline: true });
+
+  products.forEach((product, index) => {
+    doc
+      .fontSize(12)
+      .text(
+        `${index + 1}. ${product.name} ${product.description} - ${
+          product.category
+        } - ${product.sku} - ${product.quantity} - ${product.price}`
+      );
+  });
+  doc.end();
+};
+
 module.exports = {
   getAllProduct,
   createProduct,
   updateProduct,
   deleteProduct,
+  getPdfDownloadProduct,
 };

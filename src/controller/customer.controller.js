@@ -1,4 +1,5 @@
 const Customer = require("../model/customer.model");
+const PDFDocument = require("pdfkit");
 
 const getAllCustomer = async (req, res) => {
   try {
@@ -6,7 +7,10 @@ const getAllCustomer = async (req, res) => {
 
     if (req.user.role === "admin") {
       teamAdminId = req.user._id;
-    } else if (req.user.role === "sales representative" ||  req.user.role === "product manager") {
+    } else if (
+      req.user.role === "sales representative" ||
+      req.user.role === "product manager"
+    ) {
       teamAdminId = req.user.createdBy;
     }
     const customer = await Customer.find({ teamAdmin: teamAdminId });
@@ -104,7 +108,7 @@ const editCustomer = async (req, res) => {
   }
   const { contact, number, countrycode, address, city, state, country } =
     req.body;
-    console.log(req.body)
+  console.log(req.body);
   const updateCustomer = {};
 
   let teamAdminId;
@@ -153,7 +157,9 @@ const editCustomer = async (req, res) => {
         .json({ message: "User not found or unauthorized" });
     }
 
-    res.status(200).json({ message: "User updated", customer: updatedCustomer });
+    res
+      .status(200)
+      .json({ message: "User updated", customer: updatedCustomer });
   } catch (error) {
     res.status(500).json({ message: "Update failed", error: error.message });
   }
@@ -190,9 +196,45 @@ const deleteCustomer = async (req, res) => {
       .json({ message: "Error deleting user", error: error.message });
   }
 };
+
+const getPdfDownloadCustomer = async (req, res) => {
+  let teamAdminId;
+
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
+
+  const customers = await Customer.find({ teamAdmin: teamAdminId });
+
+  const doc = new PDFDocument();
+  //  “Hey browser! I’m sending you a PDF file — not an image, not text, not a video. Just a PDF.”
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", 'attachment; filename="users.pdf"');
+
+  doc.pipe(res);
+
+  doc.fontSize(20).text("user's list", { underline: true });
+
+  customers.forEach((customer, index) => {
+    doc.fontSize(12).text(`${index + 1}. ${customer.firstname} ${
+      customer.lastname
+    } - ${customer.email} -
+        ${customer.contact} - ${customer.address} - ${customer.city} - ${
+      customer.state
+    } - ${customer.country}`);
+  });
+  doc.end();
+};
+
 module.exports = {
   getAllCustomer,
   createCustomer,
   editCustomer,
   deleteCustomer,
+  getPdfDownloadCustomer
 };
