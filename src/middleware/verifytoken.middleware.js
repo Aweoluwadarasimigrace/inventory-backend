@@ -2,15 +2,17 @@ const jwt = require("jsonwebtoken");
 const Auth = require("../model/auth.model");
 
 const verifyToken = async (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1]; // extract after "Bearer"
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "Authorization header is missing" });
+  }
+  const token = authHeader.split(" ")[1]; // extract after "Bearer"
 
   console.log(token, "token from header");
 
   if (!token) {
     return res.status(401).json({ message: "not authenticated" });
   }
-
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
@@ -27,11 +29,10 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-
-const verifyIsAdmin = (req,res,next)=>{
-   if(req.user.role !== "admin"){
-     return res.status(403).json({ message: "Access denied. Admins only." });
-   }
-   next()
-}
+const verifyIsAdmin = (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied. Admins only." });
+  }
+  next();
+};
 module.exports = { verifyToken, verifyIsAdmin };
