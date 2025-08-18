@@ -117,7 +117,7 @@ const verifyEmail = async (req, res) => {
     const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET_KEY);
 
     const userId = decoded.id;
-  
+
     const user = await Auth.findById(userId);
 
     if (!user) {
@@ -133,14 +133,14 @@ const verifyEmail = async (req, res) => {
     await user.save();
 
     const token = getToken(userId);
-    return res.status(201).json({ message: "Email verified successfully!", token: token });
-  } catch (error) {
     return res
-      .status(400)
-      .json({
-        message: "an error occured, failed to verify",
-        error: error.message,
-      });
+      .status(201)
+      .json({ message: "Email verified successfully!", token: token });
+  } catch (error) {
+    return res.status(400).json({
+      message: "an error occured, failed to verify",
+      error: error.message,
+    });
   }
 };
 
@@ -205,7 +205,7 @@ const resendEmail = async (req, res) => {
 // login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body)
+  console.log(req.body);
   try {
     const user = await Auth.findOne({ email });
 
@@ -235,17 +235,22 @@ const loginUser = async (req, res) => {
       token: token,
     });
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
     return res
       .status(400)
       .json({ message: "an error occured", error: error.message });
   }
 };
 
+const verifySession = async (req, res) => {
+  res.status(200).json({
+    message: "session is valid",
+    user: req.user,
+  });
+};
 
 const logOut = async (req, res) => {
   try {
-  
     return res.json({ message: "logout successful" });
   } catch (error) {
     return res
@@ -258,5 +263,6 @@ module.exports = {
   registerUser,
   verifyEmail,
   resendEmail,
-  logOut
+  logOut,
+  verifySession,
 };
