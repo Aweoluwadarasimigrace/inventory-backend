@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
+
 const app = express();
 // Middleware
 app.use(express.json({ limit: "1mb" }));
@@ -14,13 +14,13 @@ app.use(
       "http://localhost:5176",
       "https://inventory-frontend-woad-ten.vercel.app",
     ],
-    credentials: true,
+
   })
 );
 
 
 
-app.use(cookieParser());
+
 // Routes
 const authRoute = require("./src/routes/auth.route");
 const userRoute = require("./src/routes/user.route");

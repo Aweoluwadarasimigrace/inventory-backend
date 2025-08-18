@@ -2,11 +2,15 @@ const jwt = require("jsonwebtoken");
 const Auth = require("../model/auth.model");
 
 const verifyToken = async (req, res, next) => {
-  const token = req.cookies.token;
-  console.log(token, "token from cookie");
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // extract after "Bearer"
+
+  console.log(token, "token from header");
+
   if (!token) {
     return res.status(401).json({ message: "not authenticated" });
   }
+
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
