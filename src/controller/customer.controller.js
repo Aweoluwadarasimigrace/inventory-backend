@@ -16,9 +16,10 @@ const getAllCustomer = async (req, res) => {
     }
     const customer = await Customer.find({ teamAdmin: teamAdminId });
     if (customer.length === 0) {
-      return res.status(400).json({ message: "no customer found" });
+      return res.status(200).json([]);
     }
-     return res.status(200).json(customer);
+
+    return res.status(200).json(customer);
   } catch (error) {
     return res
       .status(400)

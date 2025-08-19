@@ -17,7 +17,7 @@ const getAllProduct = async (req, res) => {
       teamAdminId = req.user.createdBy;
     }
 
-    const totalProduct = await Product.countDocuments();
+    const totalProduct = await Product.countDocuments({teamAdmin: teamAdminId});
 
     const products = await Product.find({ teamAdmin: teamAdminId })
       .skip(skip)
