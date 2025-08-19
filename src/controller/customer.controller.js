@@ -14,9 +14,7 @@ const getAllCustomer = async (req, res) => {
       teamAdminId = req.user.createdBy;
     }
     const customer = await Customer.find({ teamAdmin: teamAdminId });
-    if (customer.length === 0) {
-      return res.status(400).json({ message: "customer not found" });
-    }
+
     res.status(200).json(customer);
   } catch (error) {
     return res
@@ -197,8 +195,7 @@ const deleteCustomer = async (req, res) => {
   }
 };
 
-const PDFDocument = require("pdfkit");
-const Customer = require("../models/Customer"); // adjust path if needed
+
 
 const getPdfDownloadCustomer = async (req, res) => {
   try {

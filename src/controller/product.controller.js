@@ -24,10 +24,6 @@ const getAllProduct = async (req, res) => {
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    if (products.length === 0) {
-      return res.status(400).json({ message: "no product created yet" });
-    }
-
     return res.status(200).json({
       total: totalProduct,
       page,
