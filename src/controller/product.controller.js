@@ -1,6 +1,6 @@
 const Product = require("../model/product.model");
 const uploadToCloudinary = require("../utils/cloudinary.config");
-
+const PDFDocument = require("pdfkit")
 const getAllProduct = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -174,6 +174,7 @@ const deleteProduct = async (req, res) => {
 
 const getPdfDownloadProduct = async (req, res) => {
   let teamAdminId;
+  console.log(req.user);
 
   if (req.user.role === "admin") {
     teamAdminId = req.user._id;
