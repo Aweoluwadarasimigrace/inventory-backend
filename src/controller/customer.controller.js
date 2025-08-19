@@ -2,6 +2,7 @@ const Customer = require("../model/customer.model");
 const PDFDocument = require("pdfkit");
 
 const getAllCustomer = async (req, res) => {
+  console.log(req.user, "user from get all customer");
   try {
     let teamAdminId;
 
@@ -14,10 +15,10 @@ const getAllCustomer = async (req, res) => {
       teamAdminId = req.user.createdBy;
     }
     const customer = await Customer.find({ teamAdmin: teamAdminId });
-if(customer.length === 0) {
-    return res.status(400).json({ message: "no customer found" });
-}
-    res.status(200).json(customer);
+    if (customer.length === 0) {
+      return res.status(400).json({ message: "no customer found" });
+    }
+     return res.status(200).json(customer);
   } catch (error) {
     return res
       .status(400)
@@ -197,8 +198,6 @@ const deleteCustomer = async (req, res) => {
   }
 };
 
-
-
 const getPdfDownloadCustomer = async (req, res) => {
   try {
     if (!req.user) {
@@ -223,10 +222,7 @@ const getPdfDownloadCustomer = async (req, res) => {
     const doc = new PDFDocument();
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      'attachment; filename="users.pdf"'
-    );
+    res.setHeader("Content-Disposition", 'attachment; filename="users.pdf"');
 
     doc.pipe(res);
 
@@ -236,7 +232,11 @@ const getPdfDownloadCustomer = async (req, res) => {
       doc
         .fontSize(12)
         .text(
-          `${index + 1}. ${customer.firstname} ${customer.lastname} - ${customer.email} - ${customer.contact} - ${customer.address} - ${customer.city} - ${customer.state} - ${customer.country}`
+          `${index + 1}. ${customer.firstname} ${customer.lastname} - ${
+            customer.email
+          } - ${customer.contact} - ${customer.address} - ${customer.city} - ${
+            customer.state
+          } - ${customer.country}`
         );
     });
 
@@ -247,11 +247,10 @@ const getPdfDownloadCustomer = async (req, res) => {
   }
 };
 
-
 module.exports = {
   getAllCustomer,
   createCustomer,
   editCustomer,
   deleteCustomer,
-  getPdfDownloadCustomer
+  getPdfDownloadCustomer,
 };
