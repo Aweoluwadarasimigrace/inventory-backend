@@ -194,7 +194,7 @@ const getPdfDownloadProduct = async (req, res) => {
 
   doc.pipe(res);
 
-  doc.fontSize(20).text("user's list", { underline: true });
+  doc.fontSize(20).text("product's list", { underline: true });
 
   products.forEach((product, index) => {
     doc

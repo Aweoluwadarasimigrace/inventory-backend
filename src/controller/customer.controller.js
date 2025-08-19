@@ -2,7 +2,7 @@ const Customer = require("../model/customer.model");
 const PDFDocument = require("pdfkit");
 
 const getAllCustomer = async (req, res) => {
-  console.log(req.user, "user from get all customer");
+  console.log(req.user.role, "user from get all customer");
   try {
     let teamAdminId;
 
@@ -226,7 +226,7 @@ const getPdfDownloadCustomer = async (req, res) => {
 
     doc.pipe(res);
 
-    doc.fontSize(20).text("User's List", { underline: true });
+    doc.fontSize(20).text("product's List", { underline: true });
 
     customers.forEach((customer, index) => {
       doc
