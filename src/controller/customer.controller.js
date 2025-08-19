@@ -197,39 +197,57 @@ const deleteCustomer = async (req, res) => {
   }
 };
 
+const PDFDocument = require("pdfkit");
+const Customer = require("../models/Customer"); // adjust path if needed
+
 const getPdfDownloadCustomer = async (req, res) => {
-  let teamAdminId;
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized - no user data" });
+    }
 
-  if (req.user.role === "admin") {
-    teamAdminId = req.user._id;
-  } else if (
-    req.user.role === "sales representative" ||
-    req.user.role === "product manager"
-  ) {
-    teamAdminId = req.user.createdBy;
+    let teamAdminId;
+
+    if (req.user.role === "admin") {
+      teamAdminId = req.user._id;
+    } else if (
+      req.user.role === "sales representative" ||
+      req.user.role === "product manager"
+    ) {
+      teamAdminId = req.user.createdBy;
+    } else {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const customers = await Customer.find({ teamAdmin: teamAdminId });
+
+    const doc = new PDFDocument();
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="users.pdf"'
+    );
+
+    doc.pipe(res);
+
+    doc.fontSize(20).text("User's List", { underline: true });
+
+    customers.forEach((customer, index) => {
+      doc
+        .fontSize(12)
+        .text(
+          `${index + 1}. ${customer.firstname} ${customer.lastname} - ${customer.email} - ${customer.contact} - ${customer.address} - ${customer.city} - ${customer.state} - ${customer.country}`
+        );
+    });
+
+    doc.end();
+  } catch (error) {
+    console.error("PDF generation error:", error);
+    res.status(500).json({ message: "Failed to generate PDF" });
   }
-
-  const customers = await Customer.find({ teamAdmin: teamAdminId });
-
-  const doc = new PDFDocument();
-  //  “Hey browser! I’m sending you a PDF file — not an image, not text, not a video. Just a PDF.”
-  res.setHeader("Content-Type", "application/pdf");
-  res.setHeader("Content-Disposition", 'attachment; filename="users.pdf"');
-
-  doc.pipe(res);
-
-  doc.fontSize(20).text("user's list", { underline: true });
-
-  customers.forEach((customer, index) => {
-    doc.fontSize(12).text(`${index + 1}. ${customer.firstname} ${
-      customer.lastname
-    } - ${customer.email} -
-        ${customer.contact} - ${customer.address} - ${customer.city} - ${
-      customer.state
-    } - ${customer.country}`);
-  });
-  doc.end();
 };
+
 
 module.exports = {
   getAllCustomer,
