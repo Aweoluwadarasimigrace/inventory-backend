@@ -33,7 +33,7 @@ const createSales = async (req, res) => {
       return res.status(400).json({ error: "Insufficient product quantity" });
     }
 
-    product.quantity += quantity;
+    product.quantity -= quantity;
     await product.save();
 
     const totalcost = salesPrice * quantity;
@@ -118,26 +118,28 @@ const updateSale = async (req, res) => {
 
 const deleteSale = async (req, res) => {
   const { id } = req.params;
+
+  let teamAdminId;
+
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
+
   try {
-    let teamAdminId;
-
-    if (req.user.role === "admin") {
-      teamAdminId = req.user._id;
-    } else if (
-      req.user.role === "sales representative" ||
-      req.user.role === "product manager"
-    ) {
-      teamAdminId = req.user.createdBy;
-    }
-
-    const deletedSale = await Sales.findByIdAndDelete({
+    const deletedSale = await Sales.findOneAndDelete({
       _id: id,
       teamAdmin: teamAdminId,
     });
+
     if (!deletedSale) {
-      return res.status(404).json({ error: "Sale not found" });
+      return res.status(404).json({ message: "Sale not found" });
     }
-    res.status(204).json({ message: "Sale deleted successfully" });
+    res.status(200).json({ message: "Sale deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
