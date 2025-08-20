@@ -7,7 +7,6 @@ const createSales = async (req, res) => {
     sku,
     productName,
     quantity,
-    price,
     customer,
     salesPrice,
     date,
@@ -25,7 +24,7 @@ const createSales = async (req, res) => {
       teamAdminId = req.user.createdBy;
     }
 
-    let product = await Product.findOne({ sku });
+    let product = await Product.findOne({ sku , teamAdmin: teamAdminId });
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -43,7 +42,6 @@ const createSales = async (req, res) => {
       sku,
       productName,
       quantity,
-      price,
       customer,
       salesPrice,
       totalCost: totalcost,

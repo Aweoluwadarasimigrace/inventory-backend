@@ -14,10 +14,6 @@ const salesSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    price: {
-        type: Number,
-        required: true
-    },
     customer: {
         type: String,
         required: true
