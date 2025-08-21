@@ -1,17 +1,9 @@
-const { date } = require("zod/v4");
 const Product = require("../model/product.model");
 const Sales = require("../model/sales.model");
-
+const PDFDocument = require("pdfkit-table");
 const createSales = async (req, res) => {
-  const {
-    sku,
-    productName,
-    quantity,
-    customer,
-    salesPrice,
-    date,
-    fulfilled,
-  } = req.body;
+  const { sku, productName, quantity, customer, salesPrice, date, fulfilled } =
+    req.body;
   try {
     let teamAdminId;
 
@@ -24,7 +16,7 @@ const createSales = async (req, res) => {
       teamAdminId = req.user.createdBy;
     }
 
-    let product = await Product.findOne({ sku , teamAdmin: teamAdminId });
+    let product = await Product.findOne({ sku, teamAdmin: teamAdminId });
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -81,7 +73,7 @@ const getSales = async (req, res) => {
 };
 
 const updateSale = async (req, res) => {
-     const { id } = req.params;
+  const { id } = req.params;
   const { customer, date, fulfilled } = req.body;
 
   let teamAdminId;
@@ -98,7 +90,7 @@ const updateSale = async (req, res) => {
   const updateData = {
     customer,
     date,
-    fulfilled
+    fulfilled,
   };
 
   try {
@@ -145,9 +137,70 @@ const deleteSale = async (req, res) => {
   }
 };
 
+const getPdfDownloadSales = async (req, res) => {
+  let teamAdminId;
+  console.log(req.user);
+
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
+
+  const sales = await Sales.find({ teamAdmin: teamAdminId });
+
+  const doc = new PDFDocument({ margin: 30, size: "A4" });
+  //  “Hey browser! I’m sending you a PDF file — not an image, not text, not a video. Just a PDF.”
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", 'attachment; filename="sales.pdf"');
+
+  doc.pipe(res);
+
+  doc.fontSize(16).text("Sales List", { align: "center" });
+  doc.moveDown(2);
+
+  // Define table
+  const table = {
+    headers: [
+      "S/N",
+      "Date",
+      "Product Name",
+      "Customer",
+      "SKU",
+      "Quantity",
+      "Sale Price",
+      "Total Amount",
+      "Fulfilled",
+    ],
+    rows: sales.map((sale, index) => [
+      index + 1,
+       new Date(sale.date).toLocaleDateString(),
+      sale.productName,
+      sale.customer,
+      sale.sku,
+      sale.quantity,
+      sale.salesPrice,
+      sale.totalAmount,
+      sale.fulfilled,
+    ]),
+  };
+
+  // Draw table
+  await doc.table(table, {
+    prepareHeader: () => doc.font("Helvetica-Bold").fontSize(12),
+    prepareRow: (row, i) => doc.font("Helvetica").fontSize(10),
+  });
+
+  doc.end();
+};
+
 module.exports = {
   createSales,
   getSales,
+  getPdfDownloadSales,
   updateSale,
   deleteSale,
 };

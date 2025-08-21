@@ -1,6 +1,6 @@
 const Product = require("../model/product.model");
 const uploadToCloudinary = require("../utils/cloudinary.config");
-const PDFDocument = require("pdfkit")
+const PDFDocument = require("pdfkit-table");
 const getAllProduct = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -17,7 +17,9 @@ const getAllProduct = async (req, res) => {
       teamAdminId = req.user.createdBy;
     }
 
-    const totalProduct = await Product.countDocuments({teamAdmin: teamAdminId});
+    const totalProduct = await Product.countDocuments({
+      teamAdmin: teamAdminId,
+    });
 
     const products = await Product.find({ teamAdmin: teamAdminId })
       .skip(skip)
@@ -190,23 +192,35 @@ const getPdfDownloadProduct = async (req, res) => {
   const doc = new PDFDocument();
   //  “Hey browser! I’m sending you a PDF file — not an image, not text, not a video. Just a PDF.”
   res.setHeader("Content-Type", "application/pdf");
-  res.setHeader("Content-Disposition", 'attachment; filename="users.pdf"');
+  res.setHeader("Content-Disposition", 'attachment; filename="products.pdf"');
 
   doc.pipe(res);
+  doc.fontSize(16).text("product List", { align: "center" });
+  doc.moveDown(2);
 
-  doc.fontSize(20).text("product's list", { underline: true });
+  // Define table
+  const table = {
+    headers: ["S/N", "Product Name", "Category", "SKU", "Quantity", "Price"],
+    rows: products.map((product, index) => [
+      index + 1,
+      product.name,
+      product.category,
+      product.sku,
+      product.quantity,
+      product.price,
+    ]),
+  };
 
-  products.forEach((product, index) => {
-    doc
-      .fontSize(12)
-      .text(
-        `${index + 1}. ${product.name} ${product.description} - ${
-          product.category
-        } - ${product.sku} - ${product.quantity} - ${product.price}`
-      );
+  // Draw table
+  await doc.table(table, {
+    prepareHeader: () => doc.font("Helvetica-Bold").fontSize(12),
+    prepareRow: (row, i) => doc.font("Helvetica").fontSize(10),
   });
+
   doc.end();
 };
+
+// Draw table
 
 module.exports = {
   getAllProduct,

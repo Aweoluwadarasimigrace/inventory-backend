@@ -223,22 +223,32 @@ const getPdfDownloadCustomer = async (req, res) => {
     const doc = new PDFDocument();
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", 'attachment; filename="users.pdf"');
+    res.setHeader("Content-Disposition", 'attachment; filename="customer.pdf"');
 
     doc.pipe(res);
+    doc.fontSize(20).text("Customer List", { align: "center" });
+    doc.moveDown(2);
 
-    doc.fontSize(20).text("product's List", { underline: true });
+    // Define table
+    const table = {
+      headers: ["S/N", "First Name", "Last Name", "Email", "Contact", "Address", "City", "State", "Country"],
+      rows: customers.map((customer, index) => [
+        index + 1,
+        customer.firstname,
+        customer.lastname,
+        customer.email,
+        customer.contact,
+        customer.address,
+        customer.city,
+        customer.state,
+        customer.country
+      ]),
+    };
 
-    customers.forEach((customer, index) => {
-      doc
-        .fontSize(12)
-        .text(
-          `${index + 1}. ${customer.firstname} ${customer.lastname} - ${
-            customer.email
-          } - ${customer.contact} - ${customer.address} - ${customer.city} - ${
-            customer.state
-          } - ${customer.country}`
-        );
+    // Draw table
+    await doc.table(table, {
+      prepareHeader: () => doc.font("Helvetica-Bold").fontSize(12),
+      prepareRow: (row, i) => doc.font("Helvetica").fontSize(10),
     });
 
     doc.end();
