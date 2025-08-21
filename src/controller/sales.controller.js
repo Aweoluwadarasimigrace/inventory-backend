@@ -51,6 +51,9 @@ const createSales = async (req, res) => {
 };
 
 const getSales = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
   try {
     let teamAdminId;
 
@@ -62,11 +65,17 @@ const getSales = async (req, res) => {
     ) {
       teamAdminId = req.user.createdBy;
     }
+    const totalSales = await Sales.countDocuments({ teamAdmin: teamAdminId });
 
-    const sales = await Sales.find({ teamAdmin: teamAdminId }).sort({
+    const sales = await Sales.find({ teamAdmin: teamAdminId }).skip(skip).limit(limit).sort({
       date: -1,
     });
-    res.status(200).json(sales);
+    res.status(200).json({
+      total: totalSales,
+      page,
+      totalPages: Math.ceil(totalSales / limit),
+      sales,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

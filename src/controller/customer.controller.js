@@ -2,7 +2,9 @@ const Customer = require("../model/customer.model");
 const PDFDocument = require("pdfkit");
 
 const getAllCustomer = async (req, res) => {
-  console.log(req.user.role, "user from get all customer");
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
   try {
     let teamAdminId;
 
@@ -14,12 +16,18 @@ const getAllCustomer = async (req, res) => {
     ) {
       teamAdminId = req.user.createdBy;
     }
-    const customer = await Customer.find({ teamAdmin: teamAdminId });
+    const totalCustomer = await Customer.countDocuments({ teamAdmin: teamAdminId });
+    const customer = await Customer.find({ teamAdmin: teamAdminId }).skip(skip).limit(limit);
     if (customer.length === 0) {
       return res.status(200).json([]);
     }
 
-    return res.status(200).json(customer);
+    return res.status(200).json({
+      total: totalCustomer,
+      page,
+      totalPages: Math.ceil(totalCustomer / limit),
+      customers: customer,
+    });
   } catch (error) {
     return res
       .status(400)
