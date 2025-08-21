@@ -2,6 +2,7 @@ const Product = require("../model/product.model");
 const uploadToCloudinary = require("../utils/cloudinary.config");
 const PDFDocument = require("pdfkit-table");
 const getAllProduct = async (req, res) => {
+  console.log("Fetching all products...");
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
