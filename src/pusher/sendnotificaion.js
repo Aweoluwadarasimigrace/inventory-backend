@@ -1,7 +1,5 @@
 const pusher = require("./pusher")
 
-
-
 const sendNotification = (message)=>{
          pusher.trigger("notifications", "new-notification", {
             message,

@@ -1,5 +1,6 @@
 const Customer = require("../model/customer.model");
 const PDFDocument = require("pdfkit");
+const sendNotification = require("../pusher/sendnotificaion");
 
 const getAllCustomer = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -99,7 +100,7 @@ const createCustomer = async (req, res) => {
     };
 
     const createdCustomer = await Customer.create(customerData);
-
+sendNotification(`New customer created: ${createdCustomer.firstname} ${createdCustomer.lastname}`);
     res
       .status(201)
       .json({ message: "user created successfully", createdCustomer });
@@ -166,6 +167,7 @@ const editCustomer = async (req, res) => {
         .status(404)
         .json({ message: "User not found or unauthorized" });
     }
+    sendNotification(`Customer updated: ${updatedCustomer.firstname} ${updatedCustomer.lastname}`);
 
     res
       .status(200)
@@ -198,6 +200,8 @@ const deleteCustomer = async (req, res) => {
         .status(404)
         .json({ message: "customer not found or unauthorized" });
     }
+
+    sendNotification(`Customer deleted: ${deleteCustomer.firstname} ${deleteCustomer.lastname}`);
 
     res.status(200).json({ message: "customer deleted successfully" });
   } catch (error) {

@@ -1,4 +1,5 @@
 const Product = require("../model/product.model");
+const sendNotification = require("../pusher/sendnotificaion");
 const uploadToCloudinary = require("../utils/cloudinary.config");
 const PDFDocument = require("pdfkit-table");
 const getAllProduct = async (req, res) => {
@@ -81,7 +82,7 @@ const createProduct = async (req, res) => {
     };
 
     const products = await Product.create(payload);
-
+sendNotification(`New product created: ${products.name}`);
     res.status(201).json(products);
   } catch (error) {
     res.status(500).json({ error: error.message || "Server error" });
@@ -136,6 +137,7 @@ const updateProduct = async (req, res) => {
     if (!updatedProduct) {
       return res.status(404).json({ message: "failed to update product" });
     }
+    sendNotification(`Product updated: ${updatedProduct.name}`);
 
     res
       .status(200)

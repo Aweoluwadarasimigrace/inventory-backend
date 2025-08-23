@@ -28,12 +28,14 @@ const pdfRoute = require("./src/routes/pdfdownload.route");
 const customerRoute = require("./src/routes/customer.route")
 const productRoute = require("./src/routes/product.route");
 const salesRoute = require("./src/routes/sales.route");
+const reportRoute = require("./src/routes/reports.route");
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/pdf", pdfRoute);
 app.use("/api/v1/customer", customerRoute);
 app.use("/api/v1/product", productRoute);
 app.use("/api/v1/sales", salesRoute);
+app.use("/api/v1/reports", reportRoute);
 // Health check route (for Render to confirm it works)
 app.get("/", (req, res) => {
   res.send("✅ Backend is running on Render");

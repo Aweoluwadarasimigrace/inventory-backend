@@ -1,6 +1,7 @@
 const Product = require("../model/product.model");
 const Sales = require("../model/sales.model");
 const PDFDocument = require("pdfkit-table");
+const sendNotification = require("../pusher/sendnotificaion");
 const createSales = async (req, res) => {
   const { sku, productName, quantity, customer, salesPrice, date, fulfilled } =
     req.body;
@@ -44,6 +45,8 @@ const createSales = async (req, res) => {
     };
 
     const sale = await Sales.create(payload);
+
+    sendNotification(`New sale created: ${sale.sku}`);
     res.status(201).json(sale);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -111,6 +114,8 @@ const updateSale = async (req, res) => {
     if (!updatedSale) {
       return res.status(404).json({ error: "Sale not found" });
     }
+
+    sendNotification(`Sale updated: ${updatedSale.sku}`);
     res.status(200).json(updatedSale);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -140,6 +145,7 @@ const deleteSale = async (req, res) => {
     if (!deletedSale) {
       return res.status(404).json({ message: "Sale not found" });
     }
+    sendNotification(`Sale deleted: ${deletedSale.sku}`);
     res.status(200).json({ message: "Sale deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
