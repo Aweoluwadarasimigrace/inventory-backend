@@ -105,7 +105,7 @@ const createSalesReturn = async (req, res) => {
 
 const updateSalesReturn = async (req, res) => {
   const { id } = req.params;
-  const { processed } = req.body;
+  const { processed, reason } = req.body;
 
   let teamAdminId;
 
@@ -120,7 +120,7 @@ const updateSalesReturn = async (req, res) => {
   try {
     const updatedSalesReturn = await Return.findOneAndUpdate(
       { _id: id, teamAdmin: teamAdminId },
-      { processed },
+      { processed, reason },
       { new: true }
     );
 

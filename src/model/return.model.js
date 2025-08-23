@@ -1,3 +1,5 @@
+const { default: mongoose } = require("mongoose");
+
 const returnSchema = new mongoose.Schema({
   SalesId: {
     type: mongoose.Schema.Types.ObjectId,
