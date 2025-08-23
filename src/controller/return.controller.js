@@ -1,3 +1,4 @@
+const Product = require("../model/product.model");
 const Return = require("../model/return.model");
 const Sales = require("../model/sales.model");
 const sendNotification = require("../pusher/sendnotificaion");
@@ -91,6 +92,13 @@ const createSalesReturn = async (req, res) => {
       teamAdmin: teamAdminId,
       createdBy: req.user._id,
     });
+
+
+    const product = await Product.findOne({ sku });
+    if (product) {
+      product.quantity += quantityReturned;
+      await product.save();
+    }
     sendNotification("new-return", newReturn);
 
     res
@@ -139,8 +147,44 @@ const updateSalesReturn = async (req, res) => {
   }
 };
 
+const deleteSalesReturn = async (req, res) => {
+  const { id } = req.params;
+
+  let teamAdminId;
+
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
+
+  try {
+    const deletedSalesReturn = await Return.findOneAndDelete({
+      _id: id,
+      teamAdmin: teamAdminId,
+    });
+
+    if (!deletedSalesReturn) {
+      return res.status(404).json({ message: "Sales return not found" });
+    }
+    sendNotification("delete-return", deletedSalesReturn);
+
+    res.status(200).json({
+      message: "Sales return deleted successfully",
+      salesReturn: deletedSalesReturn,
+    });
+  } catch (error) {
+    console.error("Error deleting sales return:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createSalesReturn,
   getSalesReturns,
-  updateSalesReturn
+  updateSalesReturn,
+  deleteSalesReturn
 };
