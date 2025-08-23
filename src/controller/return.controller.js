@@ -63,7 +63,7 @@ console.log(req.body, "Return body");
       teamAdminId = req.user.createdBy;
     }
 
-    const findSale = await Sales.findOne({ sku, customerName, salesPrice });
+    const findSale = await Sales.findOne({ sku});
     console.log(findSale, "Finding sale");
     if (!findSale) {
       return res
