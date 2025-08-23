@@ -102,7 +102,45 @@ const createSalesReturn = async (req, res) => {
   }
 };
 
+
+const updateSalesReturn = async (req, res) => {
+  const { id } = req.params;
+  const { processed } = req.body;
+
+  let teamAdminId;
+
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
+  try {
+    const updatedSalesReturn = await Return.findOneAndUpdate(
+      { _id: id, teamAdmin: teamAdminId },
+      { processed },
+      { new: true }
+    );
+
+    if (!updatedSalesReturn) {
+      return res.status(404).json({ message: "Sales return not found" });
+    }
+    sendNotification("update-return", updatedSalesReturn);
+
+    res.status(200).json({
+      message: "Sales return updated successfully",
+      salesReturn: updatedSalesReturn,
+    });
+  } catch (error) {
+    console.error("Error updating sales return:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createSalesReturn,
-  getSalesReturns
+  getSalesReturns,
+  updateSalesReturn
 };
