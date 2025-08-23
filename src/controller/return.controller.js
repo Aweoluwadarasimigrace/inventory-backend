@@ -50,7 +50,7 @@ const createSalesReturn = async (req, res) => {
     returnDate,
     processed,
   } = req.body;
-
+console.log(req.body, "Return body");
   try {
     let teamAdminId;
 
@@ -64,7 +64,7 @@ const createSalesReturn = async (req, res) => {
     }
 
     const findSale = await Sales.findOne({ sku, customerName, salesPrice });
-
+    console.log(findSale, "Finding sale");
     if (!findSale) {
       return res
         .status(404)
