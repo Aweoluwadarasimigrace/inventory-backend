@@ -84,6 +84,7 @@ console.log(req.body, "Return body");
       SalesId: findSale._id,
       quantityReturned,
       reason,
+      invoiceNo,
       sku,
       customerName,
       salesPrice,
