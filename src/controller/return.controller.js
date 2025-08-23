@@ -44,6 +44,7 @@ const createSalesReturn = async (req, res) => {
   const {
     quantityReturned,
     reason,
+    invoiceNo,
     sku,
     customerName,
     salesPrice,
@@ -63,12 +64,12 @@ console.log(req.body, "Return body");
       teamAdminId = req.user.createdBy;
     }
 
-    const findSale = await Sales.findOne({ sku});
+    const findSale = await Sales.findOne({ invoiceNo });
     console.log(findSale, "Finding sale");
     if (!findSale) {
       return res
         .status(404)
-        .json({ message: "Sale not found for this SKU and Customer" });
+        .json({ message: "Sale not found for this invoice number" });
     }
 
     if (quantityReturned > findSale.quantity) {

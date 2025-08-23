@@ -30,9 +30,11 @@ const createSales = async (req, res) => {
     await product.save();
 
     const totalcost = salesPrice * quantity;
+    const invoiceNo = `INV-${Date.now()}`;
 
     const payload = {
       sku,
+      invoiceNo,
       productName,
       quantity,
       customer,

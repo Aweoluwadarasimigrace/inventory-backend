@@ -8,6 +8,7 @@ const returnSchema = new mongoose.Schema({
   },
   quantityReturned: { type: Number, required: true },
   reason: { type: String, required: true },
+  invoiceNo: { type: String, required: true },
   sku: { type: String, required: true },
   customerName: { type: String, required: true },
   salesPrice: { type: Number, required: true },

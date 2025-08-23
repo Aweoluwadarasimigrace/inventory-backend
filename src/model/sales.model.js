@@ -6,6 +6,11 @@ const salesSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    invoiceNo: {
+        type: String,
+        required: true,
+        unique: true
+    },
     productName: {
         type: String,
         required: true
