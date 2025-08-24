@@ -24,7 +24,7 @@ const getSalesReturns = async (req, res) => {
       teamAdmin: teamAdminId,
     });
 
-    const returns = await Return.find({ teamAdmin: teamAdminId })
+    const salesReturns = await Return.find({ teamAdmin: teamAdminId })
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
@@ -32,7 +32,7 @@ const getSalesReturns = async (req, res) => {
       total: totalReturns,
       page,
       totalPages: Math.ceil(totalReturns / limit),
-      returns,
+      salesReturns,
     });
   } catch (error) {
     console.error("Error retrieving sales returns:", error);
