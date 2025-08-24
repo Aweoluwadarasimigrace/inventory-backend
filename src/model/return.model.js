@@ -10,6 +10,7 @@ const returnSchema = new mongoose.Schema({
   reason: { type: String },
   invoiceNo: { type: String },
   sku: { type: String },
+  productName: { type: String },
   customerName: { type: String },
   salesPrice: { type: Number },
   returnDate: { type: Date, required: true },
