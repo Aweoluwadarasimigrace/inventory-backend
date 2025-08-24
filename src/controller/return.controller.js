@@ -78,7 +78,7 @@ console.log(req.body, "Return body");
         .json({ message: "Return quantity exceeds sold quantity" });
     }
 
-    const totalReturnAmount = Number(quantityReturned) * Number(salesPrice);
+    const totalReturnAmount = Number(salesPrice) * Number(quantityReturned);
 
     const newReturn = await Return.create({
       SalesId: findSale._id,
