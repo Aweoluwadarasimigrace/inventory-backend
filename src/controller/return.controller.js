@@ -187,7 +187,7 @@ const deleteSalesReturn = async (req, res) => {
   }
 };
 
-export const getSalesReturnPdf = async (req, res) => {
+const getSalesReturnPdf = async (req, res) => {
  
 
   let teamAdminId;
