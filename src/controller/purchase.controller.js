@@ -1,6 +1,6 @@
-const Product = require("../model/product.model");
 const Purchase = require("../model/purchase.model");
 const sendNotification = require("../pusher/sendnotificaion");
+const Product = require("../model/product.model");
 
 
 const createPurchase = async (req, res) => {
@@ -153,5 +153,6 @@ if (req.user.role === "admin") {
 module.exports = {
   createPurchase,
   getPurchases,
-  updatePurchase
+  updatePurchase,
+  deletePurchase
 };
