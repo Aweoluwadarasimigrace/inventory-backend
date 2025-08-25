@@ -50,7 +50,9 @@ const getDailySales = async (req, res) => {
     const totalSalesDocument = await Sales.countDocuments({teamAdmin: teamAdminId});
     const sales = await Sales.aggregate([
       {
-        $match: { teamAdmin: teamAdminId },
+         $match: { teamAdmin: teamAdminId },
+      },
+      {
         // $group is used to group documents together by a certain key.
         $group: {
           _id: {
@@ -93,7 +95,9 @@ const getMonthlySales = async (req, res) => {
 
     const sales = await Sales.aggregate([
       {
-        $match: { teamAdmin: teamAdminId },
+          $match: { teamAdmin: teamAdminId },
+      },
+      {
         $group: {
           _id: {
             month: { $month: "$date" },
@@ -131,6 +135,8 @@ const getYearlySales = async (req, res) => {
     const sales = await Sales.aggregate([
       {
         $match: { teamAdmin: teamAdminId },
+      },
+      {
         $group: {
           _id: {
             year: { $year: "$date" },
