@@ -2,6 +2,7 @@ const Sales = require("../model/sales.model");
 
 const getOverview = async (req, res) => {
   // Logic to get report overview
+  console.log("Fetching report overview...");
   try {
 
     let teamAdminId;
@@ -34,6 +35,7 @@ const getOverview = async (req, res) => {
 };
 
 const getDailySales = async (req, res) => {
+  console.log(req.user, "fetching daily sales...");
   try {
 
   let teamAdminId;
