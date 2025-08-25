@@ -1,6 +1,6 @@
 const Sales = require("../model/sales.model");
 
-const getOverview = (req, res) => {
+const getOverview = async (req, res) => {
   // Logic to get report overview
   try {
 
@@ -12,7 +12,7 @@ const getOverview = (req, res) => {
       teamAdminId = req.user.createdBy;
     }
 
-    const overview = Sales.aggregate([
+    const overview = await Sales.aggregate([
       {
         $match: { teamAdmin: teamAdminId },
       },
