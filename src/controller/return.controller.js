@@ -1,8 +1,7 @@
-import Product from "../model/product.model";
-
 const Return = require("../model/return.model");
 const Sales = require("../model/sales.model");
 const sendNotification = require("../pusher/sendnotificaion");
+const Product = require("../model/product.model");
 const PDFDocument = require("pdfkit-table");
 
 const getSalesReturns = async (req, res) => {
