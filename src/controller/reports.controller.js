@@ -132,6 +132,8 @@ const getYearlySales = async (req, res) => {
       teamAdminId = req.user.createdBy;
     }
 
+     const totalSalesDocument = await Sales.countDocuments({teamAdmin: teamAdminId});
+
     const sales = await Sales.aggregate([
       {
         $match: { teamAdmin: teamAdminId },
@@ -139,7 +141,7 @@ const getYearlySales = async (req, res) => {
       {
         $group: {
           _id: {
-            year: { $year: "$date" },
+             year: { $year: "$date" },
           },
           totalSales: { $sum: "$salesPrice" },
           totalQuantity: { $sum: "$quantity" },
