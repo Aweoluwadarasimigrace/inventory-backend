@@ -19,11 +19,11 @@ const createSales = async (req, res) => {
 
     let product = await Product.findOne({ sku, teamAdmin: teamAdminId });
     if (!product) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     if (product.quantity < quantity) {
-      return res.status(400).json({ error: "Insufficient product quantity" });
+      return res.status(400).json({ message: "Insufficient product quantity" });
     }
 
     product.quantity -= quantity;
@@ -51,7 +51,7 @@ const createSales = async (req, res) => {
     sendNotification(`New sale created: ${sale.sku}`);
     res.status(201).json(sale);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -73,7 +73,7 @@ const getSales = async (req, res) => {
     const totalSales = await Sales.countDocuments({ teamAdmin: teamAdminId });
 
     const sales = await Sales.find({ teamAdmin: teamAdminId }).skip(skip).limit(limit).sort({
-      date: -1,
+      createdAt: -1,
     });
     res.status(200).json({
       total: totalSales,
@@ -82,7 +82,7 @@ const getSales = async (req, res) => {
       sales,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -120,7 +120,7 @@ const updateSale = async (req, res) => {
     sendNotification(`Sale updated: ${updatedSale.sku}`);
     res.status(200).json(updatedSale);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -150,7 +150,7 @@ const deleteSale = async (req, res) => {
     sendNotification(`Sale deleted: ${deletedSale.sku}`);
     res.status(200).json({ message: "Sale deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

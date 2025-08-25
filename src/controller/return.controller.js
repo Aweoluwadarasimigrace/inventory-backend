@@ -2,6 +2,7 @@ const Product = require("../model/product.model");
 const Return = require("../model/return.model");
 const Sales = require("../model/sales.model");
 const sendNotification = require("../pusher/sendnotificaion");
+const PDFDocument = require("pdfkit-table");
 
 const getSalesReturns = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -186,9 +187,76 @@ const deleteSalesReturn = async (req, res) => {
   }
 };
 
+export const getSalesReturnPdf = async (req, res) => {
+ 
+
+  let teamAdminId;
+    console.log(req.user);
+  
+    if (req.user.role === "admin") {
+      teamAdminId = req.user._id;
+    } else if (
+      req.user.role === "sales representative" ||
+      req.user.role === "product manager"
+    ) {
+      teamAdminId = req.user.createdBy;
+    }
+
+    const returns = await Return.find({ teamAdmin: teamAdminId });
+
+    const doc = new PDFDocument({ margin: 30, size: "A4" });
+    //  “Hey browser! I’m sending you a PDF file — not an image, not text, not a video. Just a PDF.”
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'attachment; filename="sales Return.pdf"');
+  
+    doc.pipe(res);
+  
+    doc.fontSize(16).text("Sales Return", { align: "center" });
+    doc.moveDown(2);
+  
+    // Define table
+    const table = {
+      headers: [
+        "S/N",
+        "Date",
+        "Quantity Returned",
+        "Reason",
+        "Invoice No",
+        "SKU",
+        "Product Name",
+        "Customer Name",
+        "Sale Price",
+        "Processed",
+         "Total Amount",
+      ],
+      rows: returns.map((returnItem, index) => [
+        index + 1,
+        new Date(returnItem.returnDate).toLocaleDateString(),
+        returnItem.quantityReturned,
+        returnItem.reason,
+        returnItem.invoiceNo,
+        returnItem.sku,
+        returnItem.productName,
+        returnItem.customerName,
+        returnItem.salesPrice,
+        returnItem.processed,
+        returnItem.totalReturnAmount,
+      ]),
+    };
+  
+    // Draw table
+    await doc.table(table, {
+      prepareHeader: () => doc.font("Helvetica-Bold").fontSize(12),
+      prepareRow: (row, i) => doc.font("Helvetica").fontSize(10),
+    });
+  
+    doc.end();
+}
+
 module.exports = {
   createSalesReturn,
   getSalesReturns,
   updateSalesReturn,
-  deleteSalesReturn
+  deleteSalesReturn,
+  getSalesReturnPdf
 };
