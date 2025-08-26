@@ -54,12 +54,9 @@ const createPurchase = async (req, res) => {
       createdBy: req.user._id,
     };
 
-    const newPurchase = await Purchase.create(payload);
+    const purchase = await Purchase.create(payload);
     sendNotification(`new_purchase_created ${payload.sku}`);
-    res.status(201).json({
-      message: "Purchase created successfully",
-      purchase: newPurchase,
-    });
+    res.status(201).json( purchase);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
