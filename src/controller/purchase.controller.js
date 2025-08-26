@@ -32,10 +32,10 @@ const createPurchase = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    product.quantity += quantity;
+    product.quantity += Number(quantity);
     await product.save();
 
-    const totalcost = purchasePrice * quantity;
+    const totalcost = purchasePrice * Number(quantity);
     const invoiceNo = `INV-${Date.now()}`;
 
     const payload = {

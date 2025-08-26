@@ -101,7 +101,7 @@ console.log(req.body, "Return body");
 
     const product = await Product.findOne({ sku });
     if (product) {
-      product.quantity += quantityReturned;
+      product.quantity += Number(quantityReturned);
       await product.save();
     }
     sendNotification("new-return", newReturn);

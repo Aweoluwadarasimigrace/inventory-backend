@@ -26,10 +26,10 @@ const createSales = async (req, res) => {
       return res.status(400).json({ message: "Insufficient product quantity" });
     }
 
-    product.quantity -= quantity;
+    product.quantity -= Number(quantity);
     await product.save();
 
-    const totalcost = salesPrice * quantity;
+    const totalcost = salesPrice * Number(quantity);
     const invoiceNo = `INV-${Date.now()}`;
 
     const payload = {
