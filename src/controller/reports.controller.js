@@ -2,7 +2,6 @@ const Sales = require("../model/sales.model");
 
 const getOverview = async (req, res) => {
   // Logic to get report overview
-  console.log("Fetching report overview...");
   try {
 
     let teamAdminId;
@@ -29,13 +28,11 @@ const getOverview = async (req, res) => {
 
     res.status(200).json(overview[0])
   } catch (error) {
-    console.error("Error fetching report overview:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
 const getDailySales = async (req, res) => {
-  console.log(req.user, "fetching daily sales...");
   try {
 
   let teamAdminId;
