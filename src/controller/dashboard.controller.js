@@ -44,7 +44,7 @@ const getDashboardStats = async (req, res) => {
       { $match: { teamAdmin: teamAdminId } },
       {
         $group: {
-          _id: null,
+           _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
           totalSales: { $sum: "$totalCost" },
           totalQuantity: { $sum: "$quantity" },
         },
@@ -55,7 +55,7 @@ const getDashboardStats = async (req, res) => {
       { $match: { teamAdmin: teamAdminId } },
       {
         $group: {
-          _id: null,
+         _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
           totalPurchases: { $sum: "$totalcost" },
           totalQuantity: { $sum: "$quantity" },
         },
