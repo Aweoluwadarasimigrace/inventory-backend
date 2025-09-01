@@ -65,9 +65,9 @@ const getDashboardStats = async (req, res) => {
     res.json({
       salesOvertime,
       purchaseOvertime,
-      totalSales: totalSales[0] || {},
-      totalPurchases: totalPurchases[0] || {},
-      revenue: (totalSales[0]?.totalSales || 0) - (totalPurchases[0]?.totalPurchases || 0),
+      totalSales: totalSales || {},
+      totalPurchases: totalPurchases || {},
+      revenue: (totalSales?.totalSales || 0) - (totalPurchases?.totalPurchases || 0),
     });
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
