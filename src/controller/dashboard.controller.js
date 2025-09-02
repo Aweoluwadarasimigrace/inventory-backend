@@ -121,6 +121,7 @@ try {
       {
         $group: {
           _id: "$sku",
+          name: { $first: "$productName" },
           totalQuantity: { $sum: "$quantity" },
         },
       },
@@ -128,7 +129,7 @@ try {
     ]);
 
     res.json({
-      totalProductsInStock: totalProductsInStock[0] || {},
+      totalProductsInStock: totalProductsInStock,
     });
 } catch (error) {
   console.error("Error fetching total products:", error);
