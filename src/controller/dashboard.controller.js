@@ -121,7 +121,7 @@ try {
       {
         $group: {
           _id: "$sku",
-          name: { $first: "$productName" },
+          name: { $first: "$name" },
           totalQuantity: { $sum: "$quantity" },
         },
       },
