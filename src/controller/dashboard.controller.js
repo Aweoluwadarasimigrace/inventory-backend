@@ -120,10 +120,11 @@ try {
       { $match: { teamAdmin: teamAdminId } },
       {
         $group: {
-          _id: null,
+          _id: "$sku",
           totalQuantity: { $sum: "$quantity" },
         },
       },
+       { $sort: { totalQuantity: -1 } }
     ]);
 
     res.json({
@@ -238,10 +239,10 @@ const topSellingProduct = async (req, res) => {
         },
       },
       { $sort: { totalQuantity: -1 } },
-      { $limit: 1 }
+      { $limit: 7 }
     ]);
 
-    res.json(topProduct[0] || {});
+    res.json(topProduct);
   } catch (error) {
     console.error("Error fetching top selling product:", error);
   }
