@@ -1,3 +1,5 @@
+const Customer = require("../model/customer.model");
+const Product = require("../model/product.model");
 const Purchase = require("../model/purchase.model");
 const Sales = require("../model/sales.model");
 
@@ -102,6 +104,155 @@ const totalQuantityPurchased = await Purchase.aggregate([
   }
 };
 
+
+const getTotalProduct = async(req,res)=>{
+ let teamAdminId;
+
+    if(req.user.role === "admin"){
+      teamAdminId = req.user._id;
+    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
+      teamAdminId = req.user.createdBy;
+    }
+
+try {
+  
+    const totalProductsInStock = await Product.aggregate([
+      { $match: { teamAdmin: teamAdminId } },
+      {
+        $group: {
+          _id: null,
+          totalQuantity: { $sum: "$quantity" },
+        },
+      },
+    ]);
+
+    res.json({
+      totalProductsInStock: totalProductsInStock[0] || {},
+    });
+} catch (error) {
+  console.error("Error fetching total products:", error);
+}
+};
+
+
+const outofStockProducts = async(req,res)=>{
+   let teamAdminId;
+
+    if(req.user.role === "admin"){
+      teamAdminId = req.user._id;
+    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
+      teamAdminId = req.user.createdBy;
+    }
+
+  try {
+    const outofStock = await Product.find({teamAdmin: teamAdminId, quantity: 0});
+    res.json({count: outofStock.length, items: outofStock})
+  } catch (error) {
+    console.error("Error fetching out of stock products:", error);
+  }
+}
+
+const totalCustomer = async(req,res)=>{
+   let teamAdminId;
+
+    if(req.user.role === "admin"){
+      teamAdminId = req.user._id;
+    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
+      teamAdminId = req.user.createdBy;
+    }
+
+  try {
+    const totalCustomers = await Customer.countDocuments({teamAdmin: teamAdminId});
+    res.json({count: totalCustomers});
+  } catch (error) {
+    console.error("Error fetching total customers:", error);
+  }
+};
+
+const lowStockProducts = async(req,res)=>{
+
+  let teamAdminId;
+
+    if(req.user.role === "admin"){
+      teamAdminId = req.user._id;
+    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
+      teamAdminId = req.user.createdBy;
+    }
+
+  try {
+    const lowStock = await Product.find({teamAdmin: teamAdminId, quantity: {$lt: 5}});
+    res.json({count: lowStock.length, items: lowStock})
+  } catch (error) {
+    console.error("Error fetching low stock products:", error);
+  }
+}
+
+const totalSalesPermonth = async(req,res)=>{
+
+  let teamAdminId;
+
+    if(req.user.role === "admin"){
+      teamAdminId = req.user._id;
+    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
+      teamAdminId = req.user.createdBy;
+    }
+
+  try {
+     const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const sales = await Sales.aggregate([
+
+      { $match: { teamAdmin: teamAdminId , date: { $gte: startOfMonth}} },
+      {
+        $group: {
+          _id: null,
+          totalSales: { $sum: "$totalCost" },
+          totalQuantity: { $sum: "$quantity" }
+        },
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    res.json({total: sales[0]?.totalSales, totalQuantity: sales[0]?.totalQuantity});
+  } catch (error) {
+    console.error("Error fetching total sales per month:", error);
+  }
+};
+
+const topSellingProduct = async (req, res) => {
+  let teamAdminId;
+
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (req.user.role === "sales representative" || req.user.role === "product manager") {
+    teamAdminId = req.user.createdBy;
+  }
+
+  try {
+    const topProduct = await Sales.aggregate([
+      { $match: { teamAdmin: teamAdminId } },
+      {
+        $group: {
+          _id: "$sku",
+          name: { $first: "$productName" },
+          totalQuantity: { $sum: "$quantity" }
+        },
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 1 }
+    ]);
+
+    res.json(topProduct[0] || {});
+  } catch (error) {
+    console.error("Error fetching top selling product:", error);
+  }
+};
+
 module.exports = {
   getDashboardStats,
+  getTotalProduct,
+  outofStockProducts,
+  totalCustomer,
+  lowStockProducts,
+  totalSalesPermonth,
+  topSellingProduct
 };
