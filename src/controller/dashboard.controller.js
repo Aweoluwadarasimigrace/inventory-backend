@@ -47,7 +47,6 @@ const totalSales = await Sales.aggregate([
     $group: {
       _id: { $dateToString: { format: "%Y-%m", date: "$date" } }, // Group by Year-Month
       totalRevenue: { $sum: "$totalCost" }, // revenue earned
-      totalQuantity: { $sum: "$quantity" }
     },
   },
   { $sort: { _id: 1 } } // Sort by month
@@ -60,18 +59,42 @@ const totalPurchases = await Purchase.aggregate([
     $group: {
       _id: { $dateToString: { format: "%Y-%m", date: "$date" } }, // Group by Year-Month
       totalCost: { $sum: "$totalcost" }, // money spent
-      totalQuantity: { $sum: "$quantity" }
     },
   },
   { $sort: { _id: 1 } }
 ]);
 
 
+
+const totalQuantitySold = await Sales.aggregate([
+  { $match: { teamAdmin: teamAdminId } },
+  {
+    $group: {
+      _id: null,
+      totalQuantity: { $sum: "$quantity" },
+    },
+  },
+  { $sort: { _id: 1 } }
+]);
+
+const totalQuantityPurchased = await Purchase.aggregate([
+  { $match: { teamAdmin: teamAdminId } },
+  {
+    $group: {
+      _id: null,
+      totalQuantity: { $sum: "$quantity" },
+    },
+  },
+  { $sort: { _id: 1 } }
+]);
+
     res.json({
       salesOvertime,
       purchaseOvertime,
       totalSales: totalSales || {},
       totalPurchases: totalPurchases || {},
+      totalQuantitySold: totalQuantitySold || {},
+      totalQuantityPurchased: totalQuantityPurchased || {},
     });
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
