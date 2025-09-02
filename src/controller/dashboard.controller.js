@@ -93,8 +93,8 @@ const totalQuantityPurchased = await Purchase.aggregate([
       purchaseOvertime,
       totalSales: totalSales || {},
       totalPurchases: totalPurchases || {},
-      totalQuantitySold: totalQuantitySold || {},
-      totalQuantityPurchased: totalQuantityPurchased || {},
+      totalQuantitySold: totalQuantitySold[0],
+      totalQuantityPurchased: totalQuantityPurchased[0],
     });
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
