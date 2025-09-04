@@ -171,6 +171,24 @@ const totalCustomer = async(req,res)=>{
   }
 };
 
+const totalProduct = async(req,res)=>{
+ let teamAdminId;
+
+    if(req.user.role === "admin"){
+      teamAdminId = req.user._id;
+    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
+      teamAdminId = req.user.createdBy;
+    }
+
+    try {
+      const totalProduct = await Product.countDocuments({teamAdmin: teamAdminId})
+      res.json({count: totalProduct})
+    } catch (error) {
+       console.error("Error fetching total product:", error);
+    }
+
+}
+
 const lowStockProducts = async(req,res)=>{
 
   let teamAdminId;
@@ -254,6 +272,7 @@ module.exports = {
   getTotalProduct,
   outofStockProducts,
   totalCustomer,
+  totalProduct,
   lowStockProducts,
   totalSalesPermonth,
   topSellingProduct
