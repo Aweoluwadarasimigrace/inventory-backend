@@ -43,52 +43,50 @@ const getDashboardStats = async (req, res) => {
     ]);
 
     // Sales = Revenue
-const totalSales = await Sales.aggregate([
-  { $match: { teamAdmin: teamAdminId } },
-  {
-    $group: {
-      _id: { $dateToString: { format: "%Y-%m", date: "$date" } }, // Group by Year-Month
-      totalRevenue: { $sum: "$totalCost" }, // revenue earned
-    },
-  },
-  { $sort: { _id: 1 } } // Sort by month
-]);
+    const totalSales = await Sales.aggregate([
+      { $match: { teamAdmin: teamAdminId } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$date" } }, // Group by Year-Month
+          totalRevenue: { $sum: "$totalCost" }, // revenue earned
+        },
+      },
+      { $sort: { _id: 1 } }, // Sort by month
+    ]);
 
-// Purchases = Cost
-const totalPurchases = await Purchase.aggregate([
-  { $match: { teamAdmin: teamAdminId } },
-  {
-    $group: {
-      _id: { $dateToString: { format: "%Y-%m", date: "$date" } }, // Group by Year-Month
-      totalCost: { $sum: "$totalcost" }, // money spent
-    },
-  },
-  { $sort: { _id: 1 } }
-]);
+    // Purchases = Cost
+    const totalPurchases = await Purchase.aggregate([
+      { $match: { teamAdmin: teamAdminId } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$date" } }, // Group by Year-Month
+          totalCost: { $sum: "$totalcost" }, // money spent
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
 
+    const totalQuantitySold = await Sales.aggregate([
+      { $match: { teamAdmin: teamAdminId } },
+      {
+        $group: {
+          _id: null,
+          totalQuantity: { $sum: "$quantity" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
 
-
-const totalQuantitySold = await Sales.aggregate([
-  { $match: { teamAdmin: teamAdminId } },
-  {
-    $group: {
-      _id: null,
-      totalQuantity: { $sum: "$quantity" },
-    },
-  },
-  { $sort: { _id: 1 } }
-]);
-
-const totalQuantityPurchased = await Purchase.aggregate([
-  { $match: { teamAdmin: teamAdminId } },
-  {
-    $group: {
-      _id: null,
-      totalQuantity: { $sum: "$quantity" },
-    },
-  },
-  { $sort: { _id: 1 } }
-]);
+    const totalQuantityPurchased = await Purchase.aggregate([
+      { $match: { teamAdmin: teamAdminId } },
+      {
+        $group: {
+          _id: null,
+          totalQuantity: { $sum: "$quantity" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
 
     res.json({
       salesOvertime,
@@ -104,18 +102,19 @@ const totalQuantityPurchased = await Purchase.aggregate([
   }
 };
 
+const getTotalProduct = async (req, res) => {
+  let teamAdminId;
 
-const getTotalProduct = async(req,res)=>{
- let teamAdminId;
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
 
-    if(req.user.role === "admin"){
-      teamAdminId = req.user._id;
-    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
-      teamAdminId = req.user.createdBy;
-    }
-
-try {
-  
+  try {
     const totalProductsInStock = await Product.aggregate([
       { $match: { teamAdmin: teamAdminId } },
       {
@@ -125,114 +124,141 @@ try {
           totalQuantity: { $sum: "$quantity" },
         },
       },
-       { $sort: { totalQuantity: -1 } }
+      { $sort: { totalQuantity: -1 } },
     ]);
 
     res.json({
       totalProductsInStock: totalProductsInStock,
     });
-} catch (error) {
-  console.error("Error fetching total products:", error);
-}
+  } catch (error) {
+    console.error("Error fetching total products:", error);
+  }
 };
 
+const outofStockProducts = async (req, res) => {
+  let teamAdminId;
 
-const outofStockProducts = async(req,res)=>{
-   let teamAdminId;
-
-    if(req.user.role === "admin"){
-      teamAdminId = req.user._id;
-    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
-      teamAdminId = req.user.createdBy;
-    }
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
 
   try {
-    const outofStock = await Product.find({teamAdmin: teamAdminId, quantity: 0});
-    res.json({count: outofStock.length, items: outofStock})
+    const outofStock = await Product.find({
+      teamAdmin: teamAdminId,
+      quantity: 0,
+    });
+    res.json({ count: outofStock.length, items: outofStock });
   } catch (error) {
     console.error("Error fetching out of stock products:", error);
   }
-}
+};
 
-const totalCustomer = async(req,res)=>{
-   let teamAdminId;
+const totalCustomer = async (req, res) => {
+  let teamAdminId;
 
-    if(req.user.role === "admin"){
-      teamAdminId = req.user._id;
-    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
-      teamAdminId = req.user.createdBy;
-    }
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
 
   try {
-    const totalCustomers = await Customer.countDocuments({teamAdmin: teamAdminId});
-    res.json({count: totalCustomers});
+    const totalCustomers = await Customer.countDocuments({
+      teamAdmin: teamAdminId,
+    });
+    res.json({ count: totalCustomers });
   } catch (error) {
     console.error("Error fetching total customers:", error);
   }
 };
 
-const totalProduct = async(req,res)=>{
- let teamAdminId;
-
-    if(req.user.role === "admin"){
-      teamAdminId = req.user._id;
-    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
-      teamAdminId = req.user.createdBy;
-    }
-
-    try {
-      const totalProduct = await Product.countDocuments({teamAdmin: teamAdminId})
-      res.json({count: totalProduct})
-    } catch (error) {
-       console.error("Error fetching total product:", error);
-    }
-
-}
-
-const lowStockProducts = async(req,res)=>{
-
+const totalProduct = async (req, res) => {
   let teamAdminId;
 
-    if(req.user.role === "admin"){
-      teamAdminId = req.user._id;
-    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
-      teamAdminId = req.user.createdBy;
-    }
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
 
   try {
-    const lowStock = await Product.find({teamAdmin: teamAdminId, quantity: {$lt: 5}});
-    res.json({count: lowStock.length, items: lowStock})
+    const totalProduct = await Product.countDocuments({
+      teamAdmin: teamAdminId,
+    });
+    res.json({ count: totalProduct });
+  } catch (error) {
+    console.error("Error fetching total product:", error);
+  }
+};
+
+const lowStockProducts = async (req, res) => {
+  let teamAdminId;
+
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
+
+  try {
+    const lowStock = await Product.find({
+      teamAdmin: teamAdminId,
+      quantity: { $lt: 5 },
+    });
+    res.json({ count: lowStock.length, items: lowStock });
   } catch (error) {
     console.error("Error fetching low stock products:", error);
   }
-}
+};
 
-const totalSalesPermonth = async(req,res)=>{
-
+const totalSalesPermonth = async (req, res) => {
   let teamAdminId;
 
-    if(req.user.role === "admin"){
-      teamAdminId = req.user._id;
-    }else if(req.user.role === "sales representative" || req.user.role === "product manager"){
-      teamAdminId = req.user.createdBy;
-    }
+  if (req.user.role === "admin") {
+    teamAdminId = req.user._id;
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
+    teamAdminId = req.user.createdBy;
+  }
 
   try {
-     const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const startOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    );
     const sales = await Sales.aggregate([
-
-      { $match: { teamAdmin: teamAdminId , date: { $gte: startOfMonth}} },
+      { $match: { teamAdmin: teamAdminId, date: { $gte: startOfMonth } } },
       {
         $group: {
           _id: null,
           totalSales: { $sum: "$totalCost" },
-          totalQuantity: { $sum: "$quantity" }
+          totalQuantity: { $sum: "$quantity" },
         },
       },
-      { $sort: { _id: 1 } }
+      { $sort: { _id: 1 } },
     ]);
 
-    res.json({total: sales[0]?.totalSales, totalQuantity: sales[0]?.totalQuantity});
+    res.json({
+      total: sales[0]?.totalSales,
+      totalQuantity: sales[0]?.totalQuantity,
+    });
   } catch (error) {
     console.error("Error fetching total sales per month:", error);
   }
@@ -243,7 +269,10 @@ const topSellingProduct = async (req, res) => {
 
   if (req.user.role === "admin") {
     teamAdminId = req.user._id;
-  } else if (req.user.role === "sales representative" || req.user.role === "product manager") {
+  } else if (
+    req.user.role === "sales representative" ||
+    req.user.role === "product manager"
+  ) {
     teamAdminId = req.user.createdBy;
   }
 
@@ -253,14 +282,14 @@ const topSellingProduct = async (req, res) => {
       {
         $group: {
           _id: "$sku",
-          name: { $first: "$productName" },
-          image: {$second: "$image"},
-          totalEarned: {$sum: "$totalCost"},
-          totalQuantity: { $sum: "$quantity" }
+          name: { $first: "$productName" }, // first productName seen for that SKU
+          image: { $first: "$image" }, // first image seen for that SKU
+          totalEarned: { $sum: "$totalCost" },
+          totalQuantity: { $sum: "$quantity" },
         },
       },
-      { $sort: { totalQuantity: -1 } }, 
-      { $limit: 7 }
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 7 },
     ]);
 
     res.json(topProduct);
@@ -277,5 +306,5 @@ module.exports = {
   totalProduct,
   lowStockProducts,
   totalSalesPermonth,
-  topSellingProduct
+  topSellingProduct,
 };
