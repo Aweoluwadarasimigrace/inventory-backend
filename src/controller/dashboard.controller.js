@@ -254,10 +254,12 @@ const topSellingProduct = async (req, res) => {
         $group: {
           _id: "$sku",
           name: { $first: "$productName" },
+          image: {$second: "$image"},
+          totalEarned: {$sum: "$totalCost"},
           totalQuantity: { $sum: "$quantity" }
         },
       },
-      { $sort: { totalQuantity: -1 } },
+      { $sort: { totalQuantity: -1 } }, 
       { $limit: 7 }
     ]);
 
