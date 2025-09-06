@@ -116,7 +116,7 @@ const getTotalProduct = async (req, res) => {
 
   try {
     const totalProductsInStock = await Product.aggregate([
-      { $match: { teamAdmin: teamAdminId } },
+      { $match: { teamAdmin: teamAdminId ,  quantity: { $gt: 0 }  } },
       {
         $group: {
           _id: "$sku",
