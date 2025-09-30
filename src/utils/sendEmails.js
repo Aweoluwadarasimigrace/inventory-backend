@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 
-const sendEmails = async (email, subject, html) => {
+const sendemails = async (email, subject, html) => {
   try {
     const data = await resend.emails.send({
       from: "Your App <onboarding@resend.dev>",
@@ -18,4 +18,4 @@ const sendEmails = async (email, subject, html) => {
   }
 };
 
-module.exports = sendEmails;
+module.exports = sendemails;
