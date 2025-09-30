@@ -1,7 +1,7 @@
 const Auth = require("../model/auth.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const sendEmail = require("../utils/sendEmail");
+const sendEmails = require("../utils/sendEmails");
 
 // generate token
 const getToken = (id) => {
@@ -91,7 +91,7 @@ const registerUser = async (req, res) => {
   </div>
 `;
 
-    await sendEmail(email, "verify your account ", html);
+    await sendEmails(email, "verify your account ", html);
     res.status(201).json({
       success: true,
       message:
@@ -193,7 +193,7 @@ const resendEmail = async (req, res) => {
   </div>
 `;
 
-    await sendEmail(email, "verify your account", html);
+    await sendEmails(email, "verify your account", html);
     res.status(201).json({ message: "Verification email resent!" });
   } catch (error) {
     return res
