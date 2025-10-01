@@ -9,7 +9,7 @@ const sendEmails = async (email, subject, html) => {
 
   const emailParams = new EmailParams()
     .setFrom(new Sender(process.env.SENDER_EMAIL, "My App"))
-    .setTo(new Recipient(email, "my client"))
+    .addTo(new Recipient(email))
     .setSubject(subject)
     .setHtml(html);
 
