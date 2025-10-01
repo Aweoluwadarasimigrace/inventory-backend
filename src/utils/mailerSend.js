@@ -6,8 +6,9 @@ const mailerSend = new MailerSend({
 });
 
 const sendEmails = async (email, subject, html) => {
+
   const emailParams = new EmailParams()
-    .setFrom(new Sender(process.env.EMAIL))
+    .setFrom(new Sender(process.env.EMAIL, "My App"))
     .addTo(new Recipient(email))
     .setSubject(subject)
     .setHtml(html);
