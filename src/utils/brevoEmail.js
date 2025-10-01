@@ -5,7 +5,7 @@ const brevoClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = brevoClient.authentications["api-key"];
 apiKey.apiKey = process.env.BREVO_API_KEY;
 
-const sendEmails = async (email, subject, html) => {
+const sendemail = async (email, subject, html) => {
   try {
     const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();   
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
@@ -21,4 +21,4 @@ const sendEmails = async (email, subject, html) => {
   }
 };
 
-module.exports = sendEmails;
+module.exports = sendemail;
