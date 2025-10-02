@@ -50,10 +50,6 @@ const authSchema = new mongoose.Schema({
    profilepicture: {
     type: String,
   },
-  verified: {
-    type: Boolean,
-    default: false,
-  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Auth",

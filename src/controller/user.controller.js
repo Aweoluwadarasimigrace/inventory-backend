@@ -1,8 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Auth = require("../model/auth.model");
-const sendEmail = require("../utils/sendEmail");
 const bcrypt = require("bcryptjs");
-const pusher = require("../pusher/pusher");
 const sendNotification = require("../pusher/sendnotificaion");
 
 const getAllUser = async (req, res) => {
@@ -89,45 +87,11 @@ const createUserByAdmin = async (req, res) => {
       profilepicture,
       gender,
       password: hashedPassword,
-      verified: false,
       createdBy: req.user._id,
     };
     const createdUser = await Auth.create(userData);
 
     sendNotification(`successfully created! : ${userData.username}`);
-    const id = createdUser._id;
-
-    const verifyEmailToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "10m",
-    });
-
-    const baseUrl = process.env.FRONTEND_URL;
-    const verifyLink = `${baseUrl}/auth/verify-email/?token=${verifyEmailToken}`;
-
-    const html = `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9;">
-    <h2 style="color: #333;">Welcome to TRACKSTACK INVENTORY 🎉</h2>
-    <p style="font-size: 16px; color: #555;">
-      Hello ${firstname},
-    </p>
-    <p style="font-size: 16px; color: #555;">
-      Thank you for registering! To complete your signup and activate your account, please verify your email address by clicking the button below.
-    </p>
-    <div style="text-align: center; margin: 30px 0;">
-      <a href="${verifyLink}" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
-        Verify Email
-      </a>
-    </div>
-    <p style="font-size: 14px; color: #999;">
-      If you did not sign up for this account, you can ignore this email.
-    </p>
-    <p style="font-size: 14px; color: #999;">
-      — The TRACKSTACK INVENTORY Team
-    </p>
-  </div>`;
-
-    await sendEmail(email, "verify your account ", html);
-
     res.status(201).json({ message: "user created successfully", createdUser });
   } catch (error) {
     return res
