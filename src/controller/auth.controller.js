@@ -23,7 +23,7 @@ const registerUser = async (req, res) => {
     password,
     country,
   } = req.body;
-
+console.log(req.body)
   if (
     !email ||
     !password ||
@@ -33,7 +33,7 @@ const registerUser = async (req, res) => {
     !countrycode ||
     !number
   ) {
-    return res.status(404).json({
+    return res.status(400).json({
       status: "FAILED",
       message: "Fill out all fields",
     });
@@ -42,7 +42,7 @@ const registerUser = async (req, res) => {
   try {
     const existingUser = await Auth.findOne({ email });
     if (existingUser) {
-      return res.json({
+      return res.status(400).json({
         status: "FAILED",
         message: "User Already Registered",
       });
@@ -50,6 +50,7 @@ const registerUser = async (req, res) => {
 
     const salt = await bcrypt.genSalt(13);
     const hashedPassword = await bcrypt.hash(password, salt);
+
     const newUser = await Auth.create({
       companyName,
       email,
@@ -59,27 +60,28 @@ const registerUser = async (req, res) => {
       password: hashedPassword,
       country,
     });
-const token = getToken(newUser._id);
+
+    const token = getToken(newUser._id);
+
+    // ✅ Skip email verification for now
     res.status(201).json({
       success: true,
-      message:
-        "successfully created user, please verify your email  to proceed",
+      message: "User registered successfully!",
       data: newUser,
-      token: token,
+      token,
     });
   } catch (error) {
-    return res
-      .status(400)
-      .json({ message: "an error occured", error: error.message });
+    return res.status(500).json({
+      message: "An error occurred",
+      error: error.message,
+    });
   }
 };
-
 
 
 // login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body);
   try {
     const user = await Auth.findOne({ email });
 
