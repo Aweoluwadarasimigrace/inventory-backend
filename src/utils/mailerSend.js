@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const { MailerSend, EmailParams, Sender, Recipient } = require("mailersend");
 
 
@@ -15,7 +17,7 @@ const sendEmails = async (email, subject, html) => {
 
   try {
     const response = await mailerSend.email.send(emailParams);
-    console.log("Email sent successfully:", response);
+    console.log("Email sent successfully:", response.body);
   } catch (error) {
     console.error("Error sending email:", error);
   }
